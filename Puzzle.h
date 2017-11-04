@@ -38,8 +38,18 @@ public:
 	 */
 	int Solve();
 
+	/*Checking 3 possible problems that end the game.. 
+	* 1- Have we got 4 corners?
+	* 2- Wrong number of straight edges? (left = right , bottom = top)		
+	* 3- Is the sum of edges equal to 0 ? 
+	*
+	*returns 0 on success 
+	*/
 	int preProcess();
 
 	int print();
+
+private:
+	int** finalPuzzle();
 };
 #endif

@@ -39,7 +39,10 @@ int Puzzle::Solve()
 int Puzzle::preProcess()
 {
 	int sum = 0;
-	int topStraight, bottomStraight, leftStraight, rightStraight = 0;
+	int topStraight = 0;
+	int bottomStraight = 0;
+	int leftStraight = 0;
+	int rightStraight = 0;
 	bool tr, tl, br, bl = false;
 
 	for (std::vector<Part>::size_type i = 0; i != m_vParts->size(); i++)
@@ -91,9 +94,37 @@ int Puzzle::preProcess()
 	return 0;
 }
 
+int** Puzzle::finalPuzzle()
+{
+	int rows = m_iNumOfRows;
+	int cols = m_iNumOfCols;
+	int** res = new int*[rows];
+	
+	for (int i=0; i<m_iNumOfElements; i++)
+	{
+		res[i] = new int[cols];
+	}
+
+	for (int i = 0; i < rows; i++)
+	{
+		res[(*m_vParts)[i].getRow()][(*m_vParts)[i].getCol()] = (*m_vParts)[i].getId();
+	}
+
+	return res;
+}
+
 
 int Puzzle::print()
 {
+	int** final = Puzzle::finalPuzzle();
+	for (int i = 0; i < sizeof(final); i++) //rows
+	{
+		for (int j = 0; j < sizeof(final[0]); j++) //cols
+		{
+			fprintf(m_fOutput, "%d ", final[i][j]);
+		}
+		fprintf(m_fOutput, "\n");
+	}
 
 	return 0;
 }

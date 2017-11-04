@@ -6,7 +6,7 @@
 #include <string>
 #include <iostream>
 #include "Puzzle.h"
-//
+
 using std::perror;
 
 int main(int argc, char *argv[])

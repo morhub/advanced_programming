@@ -15,6 +15,7 @@ class Part
 
 public:
 	Part(int id, int left, int top, int right, int bottom);
+
 	int getId()					{ return m_iId; }
 	int getLeft()				{ return m_iLeft; }
 	int getTop()				{ return m_iTop; }
