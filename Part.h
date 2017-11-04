@@ -1,6 +1,6 @@
 #ifndef PART_H
 #define PART_H
-
+//
 enum position {
 	LEFT,
 	TOP,

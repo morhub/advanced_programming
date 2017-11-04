@@ -1,5 +1,5 @@
 #include "Part.h"
-
+//
 Part::Part(int id, int left, int top, int right, int bottom)
 {
 	m_iId = id;
