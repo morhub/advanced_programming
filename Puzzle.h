@@ -10,30 +10,36 @@
 class Puzzle
 {
 	std::vector<Part>* m_vParts;
-	int m_iNumOfElements, m_iNumOfRows, m_iNumOfColls;
-	//file* m_fOutputFile;
+	int m_iNumOfElements, m_iNumOfRows, m_iNumOfCols;
+	FILE* m_fOutput;
 
 public:
-	Puzzle(std::string inputFile, FILE* outputFile);//file* outputFile;
+	Puzzle(FILE* outputFile);
+	~Puzzle();
+
 	int getSize()		{ return m_iNumOfElements; }
 	int getNumOfRows()	{ return m_iNumOfRows; }
-	int getNumOfColls() { return m_iNumOfColls; }
-
-	//get array
-	//get file ? 
+	int getNumOfColls() { return m_iNumOfCols; }
 
 	void setNumOfRows(int rows)		{ m_iNumOfRows  = rows; }
-	void setNumOfColls(int colls)	{ m_iNumOfColls = colls; }
-	void init(std::string path);
-	bool Solve();
-	void preProcess();
-	void printPuzzle(std::string outputPath);
+	void setNumOfCols(int cols)		{ m_iNumOfCols = cols; }
 
-private:
-	//array finalPuzzle()
+	/*
+	 * Creates an unsolved Puzzle out of input file path
+	 * @param input: input file to read from
+	 */
+	int init(std::string input);
+
+	/*
+	 * Solves a puzzle, basically sets each part's
+	 * (row, col) to its relevant position
+	 *
+	 * @param input: input path to read from
+	 */
+	int Solve();
+
+	int preProcess();
+
+	int print();
 };
-
-
-
-
 #endif

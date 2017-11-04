@@ -1,39 +1,44 @@
+#include <fstream>
+#include <string>
+#include <iostream>
 #include "Puzzle.h"
 
 
-
-Puzzle::Puzzle(std::string inputFile, FILE* outputFile)
+Puzzle::Puzzle(FILE* out)
 {
-	m_iNumOfColls = m_iNumOfRows = -1;
-	//read from file the size 
-	//m_iNumOfElements = size from file
+	m_fOutput = out;
+	m_iNumOfCols = m_iNumOfRows = -1;
 }
 
 
-void Puzzle::init(std::string path)
+int Puzzle::init(std::string path)
 {
-
+	m_iNumOfElements = -1;
+	m_vParts = NULL;
+	path = "";
+	return 0;
 }
 
 
-bool Puzzle::Solve()
+int Puzzle::Solve()
 {
-	return false;
+	return true;
 }
 
 
-void Puzzle::preProcess()
+int Puzzle::preProcess()
 {
-	int sum;
-	for (std::vector<Part>::size_type i = 0; i != m_vParts->size(); i++)
-	{
-		sum += m_vParts[i]->getLeft();
-
-	}
+//	int sum;
+//	for (std::vector<Part>::size_type i = 0; i != m_vParts->size(); i++)
+//	{
+//		sum += m_vParts[i]->getLeft();
+//
+//	}
+	return 0;
 }
 
 
-void Puzzle::printPuzzle(std::string outputPath)
+int Puzzle::print()
 {
-
+	return 0;
 }
