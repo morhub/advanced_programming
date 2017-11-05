@@ -145,16 +145,17 @@ int Puzzle::preProcess()
 
 int** Puzzle::finalPuzzle()
 {
-	int rows = m_iNumOfRows;
-	int cols = m_iNumOfCols;
+	size_t rows = m_iNumOfRows;
+	size_t cols = m_iNumOfCols;
 	int** res = new int*[rows];
-	
-	for (int i=0; i<m_iNumOfElements; i++)
+	unsigned int i;
+
+	for (i=0; i<m_iNumOfElements; i++)
 	{
 		res[i] = new int[cols];
 	}
 
-	for (int i = 0; i < rows; i++)
+	for (i = 0; i < rows; i++)
 	{
 		res[(*m_vParts)[i].getRow()][(*m_vParts)[i].getCol()] = (*m_vParts)[i].getId();
 	}
@@ -166,13 +167,15 @@ int** Puzzle::finalPuzzle()
 int Puzzle::print()
 {
 	int** final = Puzzle::finalPuzzle();
-	for (int i = 0; i < sizeof(final); i++) //rows
+	unsigned int i, j;
+
+	for (i = 0; i < sizeof(final); i++) //rows
 	{
-		for (int j = 0; j < sizeof(final[0]); j++) //cols
+		for (j = 0; j < sizeof(final[0]); j++) //cols
 		{
-			fprintf(m_fOutput, "%d ", final[i][j]);
+			*m_fOutput << final[i][j] << " ";
 		}
-		fprintf(m_fOutput, "\n");
+		*m_fOutput << endl;
 	}
 
 	return 0;
