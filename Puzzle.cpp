@@ -20,12 +20,8 @@ Puzzle::Puzzle(std::ofstream *out)
 
 Puzzle::~Puzzle()
 {
-	for (int i = 0; i < m_iNumOfElements; i++)
-	{
-		delete &m_vParts[i];  //check this 
-	}
-	delete m_vParts;
-	//delete the file ? 
+	if (m_vParts)
+		delete m_vParts;
 }
 
 int Puzzle::init(std::string path)
