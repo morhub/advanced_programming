@@ -14,6 +14,7 @@ class Part
 	int m_iRow, m_iCol;
 
 public:
+	Part();
 	Part(int id, int left, int top, int right, int bottom);
 
 	int getId()					{ return m_iId; }
@@ -26,8 +27,7 @@ public:
 	void setRow(int row)		{ m_iRow  = row; }
 	void setCol(int col)		{ m_iCol = col; }
 	bool isConnectedTo(Part& other, position pos);
-
-
+	Part operator=(const Part& p);
 //private:
 	//rotate
 

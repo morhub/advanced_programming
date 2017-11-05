@@ -8,6 +8,8 @@
 #include "Puzzle.h"
 
 using std::perror;
+using std::cout;
+using std::endl;
 
 int main(int argc, char *argv[])
 {
@@ -17,13 +19,9 @@ int main(int argc, char *argv[])
 	}
 	int rc = 0;
 
-	FILE* output = fopen(argv[2], "w");
-	if (!output) {
-		perror("Failed to open output file\n");
-		return errno;
-	}
+	std::ofstream output(argv[2]);
 
-	Puzzle* puz = new Puzzle(output);
+	Puzzle* puz = new Puzzle(&output);
 
 	rc = puz->init(argv[1]);
 	if (rc) {
@@ -50,7 +48,6 @@ int main(int argc, char *argv[])
 	}
 
 ERR_EXIT:
-	fclose(output);
     return 0;
 }
 
