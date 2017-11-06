@@ -1,6 +1,6 @@
 #ifndef PUZZLE_H
 #define PUZZLE_H
-//
+
 #include "Part.h"
 #include <fstream>
 #include <string>
@@ -16,6 +16,8 @@ class Puzzle
 public:
 	Puzzle(std::ofstream *outputFile);
 	~Puzzle();
+	Puzzle& operator=(const Puzzle&) = delete;
+	Puzzle(const Puzzle&) = delete;
 
 	int getSize()		{ return m_iNumOfElements; }
 	int getNumOfRows()	{ return m_iNumOfRows; }
