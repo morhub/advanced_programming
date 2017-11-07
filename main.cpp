@@ -4,6 +4,7 @@
 //#include "stdafx.h"
 #include <fstream>
 #include <string>
+#include <cstring>
 #include <iostream>
 #include "Puzzle.h"
 
@@ -13,13 +14,28 @@ using std::endl;
 
 int main(int argc, char *argv[])
 {
-	if (argc != 3) {
+	int rc = 0;
+	bool debug = false;
+	std::streambuf *coutbuf;
+
+	if (argc != 3 && argc != 4) {
 		printf("Usage: %s <input_file> <output_file>\n", argv[0]);
 		return -EINVAL;
 	}
-	int rc = 0;
+	if(argc == 4) {
+		if(!std::strncmp(argv[3], "-d", 2))
+			debug = true;
+		else {
+			printf("Usage: %s <input_file> <output_file>\n", argv[0]);
+			return -EINVAL;
+		}
+	}
 
 	std::ofstream output(argv[2]);
+	if (debug) {
+		coutbuf = std::cout.rdbuf(); //save old buf
+		cout.rdbuf(output.rdbuf()); //redirect std::cout to output	
+	}	
 
 	Puzzle* puz = new Puzzle(&output);
 
@@ -48,6 +64,8 @@ int main(int argc, char *argv[])
 	}
 
 ERR_EXIT:
+	if (debug)
+		cout.rdbuf(coutbuf); //reset to standard output again
     return 0;
 }
 

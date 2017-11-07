@@ -30,6 +30,7 @@ int Puzzle::init(std::string path)
 	size_t pos;
 	string line, token;
 	std::ifstream input;
+	std::vector<string> wrongIds, wrongFormats, missingIds;
 
 	input.open(path);
 	if (!input.is_open()) {
@@ -59,19 +60,65 @@ int Puzzle::init(std::string path)
 	std::vector<Part> *Parts = new std::vector<Part>(m_iNumOfElements);
 	
 	while (getline(input, line)) {
-		int id, left, up, right, down;
+		int id, left, up, right, down, eol;
+		int _rc = 0;
 		std::istringstream iss;
 		iss.str(line);
 
 		iss >> id;
-		iss >> left;
-		iss >> up;
-		iss >> right;
-		iss >> down;
+		if(iss.fail()) {
+			wrongFormats.emplace_back(line);
+			_rc = -1;
+		}
 
-		Part p(id, left, up, right, down);
-		if(id > 0 && id <= (int)m_iNumOfElements) 
-			(*Parts)[id-1] = p;
+		iss >> left;
+		if(iss.fail()) {
+			wrongFormats.emplace_back(line);
+			_rc = -1;
+		}
+
+		iss >> up;
+		if(iss.fail()) {
+			wrongFormats.emplace_back(line);
+			_rc = -1;
+		}
+
+		iss >> right;
+		if(iss.fail()) {
+			wrongFormats.emplace_back(line);
+			_rc = -1;
+		}
+
+		iss >> down;
+		if(iss.fail()) {
+			wrongFormats.emplace_back(line);
+			_rc = -1;
+		}
+
+		iss >> eol;
+		if(!iss.eof()) {
+			wrongFormats.emplace_back(line);
+			_rc = -1;
+		}
+
+		if(id <= 0 || id > (int)m_iNumOfElements) {
+			wrongIds.emplace_back(std::to_string(id));
+			_rc = -1;
+		}
+
+		if(_rc) {
+			(*Parts)[id-1] = Part(-1); //wrong ID, but not missing
+			rc |= _rc;
+		} else
+			(*Parts)[id-1] = Part(id, left, up, right, down);
+	}
+
+	for (int i = 0; i < (int)Parts->size(); i++) {
+		Part& p = Parts->at(i);
+		if(!p.getId()) { //only missing, not wrong ID
+			missingIds.emplace_back(std::to_string(i+1));
+			rc = -1;
+		}
 	}
 
 	m_vParts = Parts;
