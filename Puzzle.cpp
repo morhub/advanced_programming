@@ -30,7 +30,7 @@ int Puzzle::init(std::string path)
 	size_t pos;
 	string line, token;
 	std::ifstream input;
-
+	std::vector<string> wrongIds, wrongFormats, missingIds;
 	input.open(path);
 	if (!input.is_open()) {
 		perror("Failed to open input file\n");
@@ -58,22 +58,85 @@ int Puzzle::init(std::string path)
 	}
 	std::vector<Part> *Parts = new std::vector<Part>(m_iNumOfElements);
 	
-	while (getline(input, line)) {
-		int id, left, up, right, down;
+	while (input && getline(input, line)) {
+		int id, left, up, right, down, eol;
 		std::istringstream iss;
 		iss.str(line);
+		cout << "line: " << line << endl;
 
 		iss >> id;
-		iss >> left;
-		iss >> up;
-		iss >> right;
-		iss >> down;
+		if(iss.fail()) {
+			wrongFormats.emplace_back(line);
+			rc = -1;
+			continue;
+		}
 
-		Part p(id, left, up, right, down);
-		if(id > 0 && id <= (int)m_iNumOfElements) 
-			(*Parts)[id-1] = p;
+		iss >> left;
+		if(iss.fail()) {
+			wrongFormats.emplace_back(line);
+			rc = -1;
+			continue;
+		}
+	
+		iss >> up;
+		if(iss.fail()) {
+			wrongFormats.emplace_back(line);
+			rc = -1;
+			continue;
+		}
+	
+		iss >> right;
+		if(iss.fail()) {
+			wrongFormats.emplace_back(line);
+			rc = -1;
+			continue;
+		}
+	
+		iss >> down;
+		if(iss.fail()) {
+			wrongFormats.emplace_back(line);
+			rc = -1;
+			continue;
+		}
+	
+		iss >> eol;
+		if(!iss.fail() || !iss.eof()) {
+			wrongFormats.emplace_back(line);
+			rc = -1;
+			continue;
+		}
+	
+		if(id <= 0 || id > (int)m_iNumOfElements) {
+			wrongIds.emplace_back(std::to_string(id));
+			rc = -1;
+			continue;
+		}
+
+		Parts->at(id-1) = Part(id, left, up, right, down);
 	}
 
+	for (int i = 0; i < (int)Parts->size(); i++) {
+		Part& p = Parts->at(i);
+		if(!p.getId()) { //only missing, not wrong ID
+			missingIds.emplace_back(std::to_string(i+1));
+			rc = -1;
+		}
+	}
+
+	cout << "missing ids: ";
+	for(string s : missingIds)
+		cout << s << ",";
+	cout << endl;
+
+	cout << "wrong ids: ";
+	for(string s : wrongIds)
+		cout << s << ",";
+	cout << endl;
+
+	cout << "wrong formats:" << endl;
+	for(string s : wrongFormats)
+		cout << s << endl;
+	cout << endl;
 	m_vParts = Parts;
 	return rc;
 }

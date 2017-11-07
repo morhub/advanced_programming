@@ -14,9 +14,7 @@ class Part
 	int m_iRow, m_iCol;
 
 public:
-	Part();
-	Part(int id, int left, int top, int right, int bottom);
-	Part(const Part &p);
+	Part(int id=0, int left=0, int top=0, int right=0, int bottom=0);
 
 	int getId()					{ return m_iId; }
 	int getLeft()				{ return m_iLeft; }
