@@ -11,7 +11,7 @@ class Puzzle
 {
 	std::vector<Part> *m_vParts;
 	size_t m_iNumOfElements, m_iNumOfRows, m_iNumOfCols;
-	std::ofstream *m_fOutput;
+	std::ofstream *fout;
 
 public:
 	Puzzle(std::ofstream *outputFile);
@@ -24,8 +24,9 @@ public:
 	int getNumOfCols() { return m_iNumOfCols; }
 	int getNumOfElements() { return m_iNumOfElements; }
 
-	void setNumOfRows(int rows)		{ m_iNumOfRows  = rows; }
-	void setNumOfCols(int cols)		{ m_iNumOfCols = cols; }
+	void setNumOfRows(int rows)				{ m_iNumOfRows  = rows; }
+	void setNumOfCols(int cols)				{ m_iNumOfCols = cols; }
+	void setOutputStream(std::ofstream* f)	{ fout = f; }
 	std::vector<Part>* getParts() { return m_vParts; }
 
 	/*

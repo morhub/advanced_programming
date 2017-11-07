@@ -23,6 +23,8 @@ int main(int argc, char *argv[])
 
 	Puzzle* puz = new Puzzle(&output);
 
+	puz->setOutputStream(&output);
+
 	rc = puz->init(argv[1]);
 	if (rc) {
 		perror("Failed to init Puzzle\n");

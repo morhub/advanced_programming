@@ -14,7 +14,7 @@ using std::endl;
 
 Puzzle::Puzzle(std::ofstream *out)
 {
-	m_fOutput = out;
+	fout = out;
 	m_iNumOfCols = m_iNumOfRows = -1;
 }
 
@@ -126,19 +126,19 @@ int Puzzle::preProcess()
 	}
 
 	if (topStraight != bottomStraight || leftStraight != rightStraight)
-		perror("Cannot solve puzzle: wrong number of straight edges\n");
+		*fout <<  "Cannot solve puzzle: wrong number of straight edges\n" << endl;
 
-	if(tl == false)
-		perror("Cannot solve puzzle: missing corner element: TL\n");
+	if (tl == false)
+		*fout << "Cannot solve puzzle: missing corner element: TL\n" << endl;
 	if (tr == false)
-		perror("Cannot solve puzzle: missing corner element: TR\n");
+		*fout << "Cannot solve puzzle: missing corner element: TR\n" << endl;
 	if (bl == false)
-		perror("Cannot solve puzzle: missing corner element: BL\n");
+		*fout << "Cannot solve puzzle: missing corner element: BL\n" << endl;
 	if (br == false)
-		perror("Cannot solve puzzle: missing corner element: BR\n");
+		*fout << "Cannot solve puzzle: missing corner element: BR\n" << endl;
 
 	if (sum != 0)
-		perror("Cannot solve puzzle : sum of edges is not zero");
+		*fout << "Cannot solve puzzle : sum of edges is not zero" << endl;
 
 	return 0;
 }
@@ -173,9 +173,9 @@ int Puzzle::print()
 	{
 		for (j = 0; j < sizeof(final[0]); j++) //cols
 		{
-			*m_fOutput << final[i][j] << " ";
+			*fout << final[i][j] << " ";
 		}
-		*m_fOutput << endl;
+		*fout << endl;
 	}
 
 	return 0;
