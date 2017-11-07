@@ -1,5 +1,5 @@
 #include "Part.h"
-//
+
 Part::Part(int id, int left, int top, int right, int bottom)
 {
 	m_iId = id;
@@ -10,12 +10,10 @@ Part::Part(int id, int left, int top, int right, int bottom)
 	m_iRow = m_iCol = -1; ///Check this !!! 
 }
 
-Part::Part(const Part &p)
+
+Part::Part()
 {
-	//id = new int;
-	//*id = *p.m_iId;
-
-
+	m_iId = -1;
 }
 
 bool Part::isConnectedTo(Part& other, position pos)

@@ -1,10 +1,18 @@
 #include <fstream>
+#include <sstream>
 #include <string>
+#include <cstring>
 #include <iostream>
 #include "Puzzle.h"
 //
 
-Puzzle::Puzzle(FILE* out)
+using std::getline;
+using std::string;
+using std::cout;
+using std::endl;
+
+
+Puzzle::Puzzle(std::ofstream *out)
 {
 	m_fOutput = out;
 	m_iNumOfCols = m_iNumOfRows = -1;
@@ -12,21 +20,62 @@ Puzzle::Puzzle(FILE* out)
 
 Puzzle::~Puzzle()
 {
-	for (int i = 0; i < m_iNumOfElements; i++)
-	{
-		delete &m_vParts[i];  //check this 
-	}
-	delete m_vParts;
-	//delete the file ? 
+	if (m_vParts)
+		delete m_vParts;
 }
-
 
 int Puzzle::init(std::string path)
 {
-	m_iNumOfElements = -1;
-	m_vParts = NULL;
-	path = "";
-	return 0;
+	int rc = 0;
+	size_t pos;
+	string line, token;
+	std::ifstream input;
+
+	input.open(path);
+	if (!input.is_open()) {
+		perror("Failed to open input file\n");
+		return -EINVAL;
+	}
+
+	getline(input, line);
+	pos = line.find("=");
+	if (pos != string::npos) {
+		token = line.substr(0, pos);
+		if (token.length() < 11 ||
+			token.compare(0, 11, "NumElements")) {
+			perror("Invalid first line in input file\n");
+			rc = -EINVAL;
+		} else
+			line.erase(0, pos + 1);
+
+		token = line.substr(line.find_first_not_of(" "), string::npos);
+		std::istringstream buf(token);
+
+		buf >> m_iNumOfElements;
+		if (m_iNumOfElements < 1) {
+			perror("Invalid NumOfElements\n");
+		}
+	}
+	std::vector<Part> *Parts = new std::vector<Part>(m_iNumOfElements);
+	
+	while (getline(input, line)) {
+		int id, left, up, right, down;
+		std::istringstream iss;
+		iss.str(line);
+
+		iss >> id;
+		iss >> left;
+		iss >> up;
+		iss >> right;
+		iss >> down;
+
+		Part p(id, left, up, right, down);
+		if(id > 0 && id <= (int)m_iNumOfElements) 
+			(*Parts)[id-1] = p;
+	}
+
+	m_vParts = Parts;
+	return rc;
 }
 
 
@@ -96,16 +145,17 @@ int Puzzle::preProcess()
 
 int** Puzzle::finalPuzzle()
 {
-	int rows = m_iNumOfRows;
-	int cols = m_iNumOfCols;
+	size_t rows = m_iNumOfRows;
+	size_t cols = m_iNumOfCols;
 	int** res = new int*[rows];
-	
-	for (int i=0; i<m_iNumOfElements; i++)
+	unsigned int i;
+
+	for (i=0; i<m_iNumOfElements; i++)
 	{
 		res[i] = new int[cols];
 	}
 
-	for (int i = 0; i < rows; i++)
+	for (i = 0; i < rows; i++)
 	{
 		res[(*m_vParts)[i].getRow()][(*m_vParts)[i].getCol()] = (*m_vParts)[i].getId();
 	}
@@ -117,14 +167,17 @@ int** Puzzle::finalPuzzle()
 int Puzzle::print()
 {
 	int** final = Puzzle::finalPuzzle();
-	for (int i = 0; i < sizeof(final); i++) //rows
+	unsigned int i, j;
+
+	for (i = 0; i < sizeof(final); i++) //rows
 	{
-		for (int j = 0; j < sizeof(final[0]); j++) //cols
+		for (j = 0; j < sizeof(final[0]); j++) //cols
 		{
-			fprintf(m_fOutput, "%d ", final[i][j]);
+			*m_fOutput << final[i][j] << " ";
 		}
-		fprintf(m_fOutput, "\n");
+		*m_fOutput << endl;
 	}
 
 	return 0;
 }
+
