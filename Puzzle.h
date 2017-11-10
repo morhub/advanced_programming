@@ -21,7 +21,6 @@ public:
 	Puzzle& operator=(const Puzzle&) = delete;
 	Puzzle(const Puzzle&) = delete;
 
-	int getSize()			{ return m_iNumOfElements; }
 	int getNumOfElements()  { return m_iNumOfElements; }
 
 	void setOutputStream(std::ofstream* f) { fout = f; }
