@@ -15,7 +15,6 @@ class Puzzle
 	size_t m_iNumOfElements;
 	std::ofstream* fout;
 
-
 public:
 	Puzzle();
 	~Puzzle();

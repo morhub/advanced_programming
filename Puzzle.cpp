@@ -248,12 +248,13 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)//Table& table
 
 Table Puzzle::Solve()
 {
-	int i, ret;
-	int size = m_iNumOfElements;
+	unsigned int i;
+	int ret;
+	unsigned int size = m_iNumOfElements;
 
 	for(i = 0; i < size; i++) {
 		if (size % i == 0) {
-			Table table(i+2, size/i+2); //+2 for margins of size 1
+			Table table(i, size/i, 1); 
 			table.setFrame(-1);
 			ret = solveRec(1, 1, table);
 			if (ret == 0)
