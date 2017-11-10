@@ -15,14 +15,15 @@ class Puzzle
 	size_t m_iNumOfElements;
 	std::ofstream* fout;
 
+
 public:
 	Puzzle();
 	~Puzzle();
 	Puzzle& operator=(const Puzzle&) = delete;
 	Puzzle(const Puzzle&) = delete;
 
-	int getSize()		{ return m_iNumOfElements; }
-	int getNumOfElements() { return m_iNumOfElements; }
+	int getSize()			{ return m_iNumOfElements; }
+	int getNumOfElements()  { return m_iNumOfElements; }
 
 	void setOutputStream(std::ofstream* f) { fout = f; }
 	std::vector<Part>* getParts() { return m_vParts; }
@@ -50,10 +51,7 @@ public:
 	*/
 	int preProcess();
 
-	void print();
-
 private:
-	int** initTable();
-	int solveRec(size_t, size_t, Table&);
+	int solveRec(size_t i, size_t j, Table& tab);
 };
 #endif

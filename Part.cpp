@@ -12,7 +12,9 @@ Part::Part(int id, int left, int top, int right, int bottom)
 
 bool Part::isConnectedTo(Part& other, direction dir)
 {
-	int sum, currentEdge, otherEdge = -2;
+	int sum = -2;
+	int currentEdge = -2;
+	int otherEdge = -2;
 
 	switch (dir)
 	{

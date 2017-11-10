@@ -151,14 +151,16 @@ int Puzzle::init(std::string path)
 }
 
 
-int Puzzle::solveRec(int i, int j, int** table)//Table& table
+int Puzzle::solveRec(size_t i, size_t j, Table& tab)//Table& table
 {
 	bool isPartMatch = true;
-	for(std::vector<Part>::size_type i = 0; i != m_vParts->size(); i++)
+	int** table = tab.getTable(); 
+
+	for(size_t k = 0; k < m_iNumOfElements; k++)
 	{
-		Part& current = (*m_vParts)[i];
-		assert(table[i - 1][j]); // top edge of the frame - false when 0
-		assert(table[i][j-1]); //	left edge of the frame - false when 0
+		Part& current = (*m_vParts)[k];
+		assert(table[i - 1][j]); //  top edge of the frame - false when 0
+		assert(table[i][j-1]);  //	left edge of the frame - false when 0
 	
 		//We always check the left and top directions - 
 		//solve the puzzle from top-left to bottom-right
@@ -212,26 +214,35 @@ int Puzzle::solveRec(int i, int j, int** table)//Table& table
 			}
 		}
 
-
 		if (isPartMatch) // this part is matched to the current place of the table
 		{
 			table[i][j] = current.getId();
-			//if the table END has coming  - continue; 
-			//if end of line - if(solveRec(i+1, 1)==0) return true; 
-			//else continue;
-			//else if(solveRec(i, j+1) == 0) return true;
-			// else continue;
 
+			//End of table
+			if ((i == tab.getCols() - 1) && (j == tab.getRows() - 1))
+				return 0; //solve succeeded
+
+			//End of line
+			if (i == tab.getCols() - 1)
+			{
+				if (solveRec(i + 1, 1, tab) == 0) //move to the next line, and first column
+					return 0;
+				else
+					continue;
+			}
+			else
+			{
+				if (solveRec(i, j + 1, tab) == 0) //continue solving along the current line
+					return 0;
+				else
+					continue;
+			}
 		}
 		else
 			continue;
-
-
 	}
-	//clean uptoMe including me ;
+	tab.clean(i, j);
 	return -1;
-
-
 
 }
 
@@ -252,26 +263,21 @@ Table Puzzle::Solve()
 	return Table();
 }
 
-int Puzzle::solveRec(size_t i, size_t j, Table& table)
-{
-	i++;
-	j++;
-	table.clean();
-	return 0;
-}
-
-
 int Puzzle::preProcess()
 {
-	int sum, topStraight, bottomStraight, leftStraight, rightStraight = 0;
+	int sum = 0; 
+	int topStraight = 0;
+	int bottomStraight = 0;
+	int leftStraight = 0;
+	int rightStraight = 0;
 	bool tr, tl, br, bl = false;
 
-	for (std::vector<Part>::size_type i = 0; i != m_vParts->size(); i++)
+	for (size_t i = 0; i < m_iNumOfElements; i++)
 	{
-		int left = (*m_vParts).at(i).getLeft();
-		int top = (*m_vParts).at(i).getTop();
-		int right = (*m_vParts).at(i).getRight();
-		int bottom = (*m_vParts).at(i).getBottom();
+		int left =   (*m_vParts)[i].getLeft();
+		int top =    (*m_vParts)[i].getTop();
+		int right =  (*m_vParts)[i].getRight();
+		int bottom = (*m_vParts)[i].getBottom();
 
 		if (left == 0)
 			leftStraight++;
@@ -291,10 +297,10 @@ int Puzzle::preProcess()
 		if (bottom == 0 && left == 0)
 			bl = true;
 
-		sum += (*m_vParts).at(i).getLeft();
-		sum += (*m_vParts).at(i).getTop();
-		sum += (*m_vParts).at(i).getRight();
-		sum += (*m_vParts).at(i).getBottom();
+		sum += (*m_vParts)[i].getLeft();
+		sum += (*m_vParts)[i].getTop();
+		sum += (*m_vParts)[i].getRight();
+		sum += (*m_vParts)[i].getBottom();
 	}
 
 	if (topStraight != bottomStraight || leftStraight != rightStraight)
