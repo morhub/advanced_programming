@@ -2,13 +2,16 @@
 #include <string>
 #include <cstring>
 #include <iostream>
+#include <assert.h> 
 #include "Puzzle.h"
+
 
 using std::getline;
 using std::string;
 using std::cout;
 using std::endl;
 
+Part framePart(-1);
 
 Puzzle::Puzzle() 
 {
@@ -146,7 +149,91 @@ int Puzzle::init(std::string path)
 	m_vParts = Parts;
 	return rc;
 }
-//mor than 4 edges - took care? 
+
+
+int Puzzle::solveRec(int i, int j, int** table)//Table& table
+{
+	bool isPartMatch = true;
+	for(std::vector<Part>::size_type i = 0; i != m_vParts->size(); i++)
+	{
+		Part& current = (*m_vParts)[i];
+		assert(table[i - 1][j]); // top edge of the frame - false when 0
+		assert(table[i][j-1]); //	left edge of the frame - false when 0
+	
+		//We always check the left and top directions - 
+		//solve the puzzle from top-left to bottom-right
+		
+		if ((table[i - 1][j]) == -1) //the top frame 
+		{
+			if (!current.isConnectedTo(framePart, TOP))
+			{
+				isPartMatch = false;
+			}
+		}
+		else
+		{
+			if (!current.isConnectedTo((*m_vParts)[table[i - 1][j]], TOP))
+			{
+				isPartMatch = false;
+			}
+		}
+		
+
+		if (table[i][j - 1] == -1) // the left frame
+		{
+			if (!current.isConnectedTo(framePart, LEFT))
+			{
+				isPartMatch = false;
+			}
+		}
+		else
+		{
+			if (!current.isConnectedTo((*m_vParts)[table[i][j - 1]], LEFT))
+			{
+				isPartMatch = false;
+			}
+		}
+		
+
+		if (table[i][j + 1] != 0) // right edge of the frame is here
+		{
+			if (!current.isConnectedTo(framePart, RIGHT))
+			{
+				isPartMatch = false;
+			}
+		}
+
+
+		if (table[i+1][j] != 0) // bottom edge of the frame is here
+		{
+			if (!current.isConnectedTo(framePart, BOTTOM))
+			{
+				isPartMatch = false;
+			}
+		}
+
+
+		if (isPartMatch) // this part is matched to the current place of the table
+		{
+			table[i][j] = current.getId();
+			//if the table END has coming  - continue; 
+			//if end of line - if(solveRec(i+1, 1)==0) return true; 
+			//else continue;
+			//else if(solveRec(i, j+1) == 0) return true;
+			// else continue;
+
+		}
+		else
+			continue;
+
+
+	}
+	//clean uptoMe including me ;
+	return -1;
+
+
+
+}
 
 Table Puzzle::Solve()
 {
@@ -181,7 +268,7 @@ int Puzzle::preProcess()
 	int bottomStraight = 0;
 	int leftStraight = 0;
 	int rightStraight = 0;
-	bool tr, tl, br,bl = false;
+	bool tr, tl, br, bl = false;
 
 	for (std::vector<Part>::size_type i = 0; i != m_vParts->size(); i++)
 	{

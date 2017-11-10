@@ -23,6 +23,7 @@ public:
 
 	int getSize()		{ return m_iNumOfElements; }
 	int getNumOfElements() { return m_iNumOfElements; }
+
 	void setOutputStream(std::ofstream* f) { fout = f; }
 	std::vector<Part>* getParts() { return m_vParts; }
 
