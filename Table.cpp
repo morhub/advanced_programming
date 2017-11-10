@@ -1,7 +1,12 @@
 #include "Table.h"
+#include <string>
+#include <iostream>
 
-Table::Table(size_t rows, size_t cols): m_iRows=rows, m_iCols=cols {
-	size_t i;
+using std::string;
+using std::endl;
+
+Table::Table(unsigned int rows, unsigned int cols): m_iRows(rows), m_iCols(cols) {
+	unsigned int i;
 
 	if(rows > 0 && cols > 0) {
 		m_iTable = new int*[rows];
@@ -12,9 +17,9 @@ Table::Table(size_t rows, size_t cols): m_iRows=rows, m_iCols=cols {
 }
 
 Table::~Table() {
-	size_t i;
+	unsigned int i;
 
-	if(rows > 0 && cols > 0) {
+	if(m_iRows > 0 && m_iCols > 0) {
 		for (i = 0; i < m_iRows; i++)
 			delete m_iTable[i];
 		delete m_iTable;
@@ -22,36 +27,37 @@ Table::~Table() {
 }
 
 
-Table::Table(const Table& table) {
-	size_t i, j;
-	Table table_cpy(table.m_iRows, table.m_iCols);
+Table::Table(const Table& table): m_iRows(table.m_iRows), m_iCols(table.m_iCols) {
+	unsigned int i, j;
 
 	if(m_iRows > 0 && m_iCols > 0) {
 		for(i = 0; i < table.m_iRows; i++)
 			for(j = 0; j < table.m_iCols; j++)
-				table_cpy.m_iTable[i][j] = table.m_iTable[i][j];
+				m_iTable[i][j] = table.m_iTable[i][j];
 	} else {
-		table_cpy.m_iTable = NULL
+		m_iTable = NULL;
 	}
-	return table_cpy;
 }
 
 
-int Table::print(std::ofstream& fout)
+void Table::print(std::ofstream& fout)
 {
-	size_t i, j;
+	unsigned int i, j;
 	string deli;
 
 	for (i = 0; i < m_iRows; i++) {
 		for (j = 0; j < m_iCols; j++) {
-			deli = (i == m_iRows-1) ? endl : " ";
+			if (i == m_iRows-1)
+				deli = "\n";
+			else
+				deli = " ";
 			fout << m_iTable[i][j] << deli;
 		}
 	}
 }
 
 void Table::setFrame(int value=0) {
-	size_t i, j;
+	unsigned int i, j;
 
 	for (i = 0; i < m_iRows; i++)
 		m_iTable[i][0] = m_iTable[i][m_iRows-1] = value;
@@ -61,10 +67,10 @@ void Table::setFrame(int value=0) {
 }
 
 void Table::clean(int x, int y, int marginSize) {
-	size_t i, j;
+	unsigned int i, j;
 
-	for (i = x; i < rows-marginSize; i++) {
-		for (j = y; j < cols-marginSize; j++)
+	for (i = x; i < m_iRows - marginSize; i++) {
+		for (j = y; j < m_iCols - marginSize; j++)
 			m_iTable[i][j] = 0;	
 		y = marginSize;
 	}

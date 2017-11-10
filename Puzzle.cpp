@@ -162,10 +162,10 @@ Table Puzzle::Solve()
 				return table;
 		}
 	}
-//	return;
+	return Table();
 }
 
-int solveRec(size_t i, size_t j, Table& table)
+int Puzzle::solveRec(size_t i, size_t j, Table& table)
 {
 	i++;
 	j++;

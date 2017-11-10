@@ -1,14 +1,16 @@
 #ifndef TABLE_H
 #define TABLE_H
+#include <iostream>
+#include <fstream>
 
 class Table
 {
-	const size_t m_iRows;
-	const size_t m_iCols;
+	const unsigned int m_iRows;
+	const unsigned int m_iCols;
 	int** m_iTable;
 
 public:
-	Table(size_t rows=0, size_t cols=0);
+	Table(unsigned int rows=0, unsigned int cols=0);
 	~Table();
 	Table(const Table&);
 	Table& operator=(const Table&) = delete;

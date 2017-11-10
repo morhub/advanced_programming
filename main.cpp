@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 
 	Table table = puz->Solve();
 	if(table.getTable())
-		puz->print();
+		table.print(output);
 	else {
 		rc = -1;
 		cout << "No Solution!" << endl;
