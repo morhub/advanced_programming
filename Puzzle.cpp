@@ -10,9 +10,9 @@ using std::cout;
 using std::endl;
 
 
-Puzzle::Puzzle(): 
+Puzzle::Puzzle() 
 {
-	m_iNumOfCols = m_iNumOfRows = -1;
+	m_vParts = NULL;
 }
 
 Puzzle::~Puzzle()
@@ -162,7 +162,15 @@ Table Puzzle::Solve()
 				return table;
 		}
 	}
-	return NULL;
+//	return;
+}
+
+int solveRec(size_t i, size_t j, Table& table)
+{
+	i++;
+	j++;
+	table.clean();
+	return 0;
 }
 
 
@@ -173,7 +181,7 @@ int Puzzle::preProcess()
 	int bottomStraight = 0;
 	int leftStraight = 0;
 	int rightStraight = 0;
-	bool tr, tl, br, bl = false;
+	bool tr, tl, br,bl = false;
 
 	for (std::vector<Part>::size_type i = 0; i != m_vParts->size(); i++)
 	{
@@ -223,13 +231,3 @@ int Puzzle::preProcess()
 
 	return 0;
 }
-
-int** Puzzle::setTable()
-{
-}
-
-
-void Puzzle::print()
-{
-}
-

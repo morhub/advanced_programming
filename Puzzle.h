@@ -38,7 +38,7 @@ public:
 	 *
 	 * @param input: input path to read from
 	 */
-	int** Solve();
+	Table Solve();
 
 	/*Checking 3 possible problems that end the game.. 
 	* 1- Have we got 4 corners?
@@ -53,6 +53,6 @@ public:
 
 private:
 	int** initTable();
-
+	int solveRec(size_t, size_t, Table&);
 };
 #endif

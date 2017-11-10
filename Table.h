@@ -3,23 +3,23 @@
 
 class Table
 {
-	int m_iRows, m_iCols;
+	const size_t m_iRows;
+	const size_t m_iCols;
 	int** m_iTable;
 
 public:
-	Table(int, int);
+	Table(size_t rows=0, size_t cols=0);
 	~Table();
-	/* We use copy c'tor, but we are satisfied with
-	 * with shallow copy
-	 */
-	Table(const Table&) = delete;
+	Table(const Table&);
 	Table& operator=(const Table&) = delete;
 
-	print(std::ofstream&);
 	int getRows() { return m_iRows; }
 	int getCols() { return m_iCols; }
 	int getSize() { return m_iRows * m_iCols; }
 	int** getTable() {return m_iTable; }
 	void setFrame(int);
+	void print(std::ofstream&);
+	void clean(int x=0, int y=0, int marginSize=0);
+
 };
 #endif
