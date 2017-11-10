@@ -1,10 +1,9 @@
 #include <fstream>
-#include <sstream>
 #include <string>
 #include <cstring>
 #include <iostream>
 #include "Puzzle.h"
-//
+
 
 using std::getline;
 using std::string;
@@ -12,9 +11,8 @@ using std::cout;
 using std::endl;
 
 
-Puzzle::Puzzle(std::ofstream *out)
+Puzzle::Puzzle()
 {
-	fout = out;
 	m_iNumOfCols = m_iNumOfRows = -1;
 }
 
@@ -123,28 +121,39 @@ int Puzzle::init(std::string path)
 		}
 	}
 
-	cout << "missing ids: ";
-	for(string s : missingIds)
-		cout << s << ",";
-	cout << endl;
+	if ((int)missingIds.size() > 0)
+	{
+		cout << "Missing puzzle element(s) with the following IDs: ";
+		for (int i = 0; i < (int)missingIds.size(); i++)
+		{
+			string deli = (i == (int)missingIds.size() - 1) ?
+				"" : ", ";
+			cout << missingIds[i] << deli;
+		}
+		cout << endl;
+	}
 
-	cout << "wrong ids: ";
+	*fout << "Puzzle of size <SIZE> cannot have the following IDs: ";
 	for(string s : wrongIds)
-		cout << s << ",";
-	cout << endl;
-
-	cout << "wrong formats:" << endl;
-	for(string s : wrongFormats)
-		cout << s << endl;
-	cout << endl;
+		*fout << s << ", ";
+	*fout << endl;
+	
+	for (string s : wrongFormats)
+	{
+		*fout << "Puzzle ID " ;
+		*fout << s;
+		*fout << " has wrong data: "<< endl;
+	}
 	m_vParts = Parts;
 	return rc;
 }
+//mor than 4 edges - took care? 
 
-
-int Puzzle::Solve()
+int** Puzzle::Solve()
 {
-	return true;
+	//initTable();
+	//solverec(i,j,table);
+	return NULL;
 }
 
 
@@ -192,13 +201,13 @@ int Puzzle::preProcess()
 		*fout <<  "Cannot solve puzzle: wrong number of straight edges\n" << endl;
 
 	if (tl == false)
-		*fout << "Cannot solve puzzle: missing corner element: TL\n" << endl;
+		*fout << "Cannot solve puzzle: missing corner element: TL" << endl;
 	if (tr == false)
-		*fout << "Cannot solve puzzle: missing corner element: TR\n" << endl;
+		*fout << "Cannot solve puzzle: missing corner element: TR" << endl;
 	if (bl == false)
-		*fout << "Cannot solve puzzle: missing corner element: BL\n" << endl;
+		*fout << "Cannot solve puzzle: missing corner element: BL" << endl;
 	if (br == false)
-		*fout << "Cannot solve puzzle: missing corner element: BR\n" << endl;
+		*fout << "Cannot solve puzzle: missing corner element: BR" << endl;
 
 	if (sum != 0)
 		*fout << "Cannot solve puzzle : sum of edges is not zero" << endl;
@@ -206,7 +215,7 @@ int Puzzle::preProcess()
 	return 0;
 }
 
-int** Puzzle::finalPuzzle()
+int** Puzzle::initTable()
 {
 	size_t rows = m_iNumOfRows;
 	size_t cols = m_iNumOfCols;
@@ -229,7 +238,7 @@ int** Puzzle::finalPuzzle()
 
 int Puzzle::print()
 {
-	int** final = Puzzle::finalPuzzle();
+	int** final = Puzzle::initTable();
 	unsigned int i, j;
 
 	for (i = 0; i < sizeof(final); i++) //rows

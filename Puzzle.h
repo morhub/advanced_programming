@@ -3,6 +3,7 @@
 
 #include "Part.h"
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <iostream>
 #include <vector>
@@ -11,10 +12,10 @@ class Puzzle
 {
 	std::vector<Part> *m_vParts;
 	size_t m_iNumOfElements, m_iNumOfRows, m_iNumOfCols;
-	std::ofstream *fout;
+	std::ofstream* fout;
 
 public:
-	Puzzle(std::ofstream *outputFile);
+	Puzzle();
 	~Puzzle();
 	Puzzle& operator=(const Puzzle&) = delete;
 	Puzzle(const Puzzle&) = delete;
@@ -26,7 +27,7 @@ public:
 
 	void setNumOfRows(int rows)				{ m_iNumOfRows  = rows; }
 	void setNumOfCols(int cols)				{ m_iNumOfCols = cols; }
-	void setOutputStream(std::ofstream* f)	{ fout = f; }
+	void setOutputStream(std::ofstream* f) { fout = f; }
 	std::vector<Part>* getParts() { return m_vParts; }
 
 	/*
@@ -41,7 +42,7 @@ public:
 	 *
 	 * @param input: input path to read from
 	 */
-	int Solve();
+	int** Solve();
 
 	/*Checking 3 possible problems that end the game.. 
 	* 1- Have we got 4 corners?
@@ -55,6 +56,7 @@ public:
 	int print();
 
 private:
-	int** finalPuzzle();
+	int** initTable();
+
 };
 #endif

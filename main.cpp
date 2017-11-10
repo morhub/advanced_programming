@@ -8,9 +8,13 @@
 #include <iostream>
 #include "Puzzle.h"
 
+
 using std::perror;
 using std::cout;
 using std::endl;
+
+//using namespace std;
+
 
 int main(int argc, char *argv[])
 {
@@ -23,7 +27,7 @@ int main(int argc, char *argv[])
 		return -EINVAL;
 	}
 	if(argc == 4) {
-		if(!std::strncmp(argv[3], "-d", 2))
+		if(!strncmp(argv[3], "-d", 2))
 			debug = true;
 		else {
 			printf("Usage: %s <input_file> <output_file>\n", argv[0]);
@@ -37,7 +41,7 @@ int main(int argc, char *argv[])
 		cout.rdbuf(output.rdbuf()); //redirect std::cout to output	
 	}	
 
-	Puzzle* puz = new Puzzle(&output);
+	Puzzle* puz = new Puzzle();
 
 	puz->setOutputStream(&output);
 
@@ -53,7 +57,7 @@ int main(int argc, char *argv[])
 		goto ERR_EXIT;
 	}
 
-	rc = puz->Solve();
+	//rc = puz->Solve();
 	if (rc) {
 		perror("Failed Solving the puzzle\n");
 		goto ERR_EXIT;

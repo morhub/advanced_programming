@@ -1,7 +1,7 @@
 #ifndef PART_H
 #define PART_H
 //
-enum position {
+enum direction {
 	LEFT,
 	TOP,
 	RIGHT,
@@ -25,7 +25,7 @@ public:
 	int getCol()				{ return m_iCol; }
 	void setRow(int row)		{ m_iRow  = row; }
 	void setCol(int col)		{ m_iCol = col; }
-	bool isConnectedTo(Part& other, position pos);
+	bool isConnectedTo(Part& other, direction dir);
 //private:
 	//rotate
 
