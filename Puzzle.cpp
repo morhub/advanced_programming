@@ -263,11 +263,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& table)
 
 int Puzzle::preProcess()
 {
-	int sum = 0;
-	int topStraight = 0;
-	int bottomStraight = 0;
-	int leftStraight = 0;
-	int rightStraight = 0;
+	int sum, topStraight, bottomStraight, leftStraight, rightStraight = 0;
 	bool tr, tl, br, bl = false;
 
 	for (std::vector<Part>::size_type i = 0; i != m_vParts->size(); i++)
