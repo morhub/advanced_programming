@@ -2,6 +2,7 @@
 #define PUZZLE_H
 
 #include "Part.h"
+#include "Table.h"
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -11,7 +12,7 @@
 class Puzzle
 {
 	std::vector<Part> *m_vParts;
-	size_t m_iNumOfElements, m_iNumOfRows, m_iNumOfCols;
+	size_t m_iNumOfElements;
 	std::ofstream* fout;
 
 public:
@@ -21,12 +22,7 @@ public:
 	Puzzle(const Puzzle&) = delete;
 
 	int getSize()		{ return m_iNumOfElements; }
-	int getNumOfRows()	{ return m_iNumOfRows; }
-	int getNumOfCols() { return m_iNumOfCols; }
 	int getNumOfElements() { return m_iNumOfElements; }
-
-	void setNumOfRows(int rows)				{ m_iNumOfRows  = rows; }
-	void setNumOfCols(int cols)				{ m_iNumOfCols = cols; }
 	void setOutputStream(std::ofstream* f) { fout = f; }
 	std::vector<Part>* getParts() { return m_vParts; }
 
@@ -53,7 +49,7 @@ public:
 	*/
 	int preProcess();
 
-	int print();
+	void print();
 
 private:
 	int** initTable();

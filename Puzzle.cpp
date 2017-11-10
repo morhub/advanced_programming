@@ -4,14 +4,13 @@
 #include <iostream>
 #include "Puzzle.h"
 
-
 using std::getline;
 using std::string;
 using std::cout;
 using std::endl;
 
 
-Puzzle::Puzzle()
+Puzzle::Puzzle(): 
 {
 	m_iNumOfCols = m_iNumOfRows = -1;
 }
@@ -149,10 +148,20 @@ int Puzzle::init(std::string path)
 }
 //mor than 4 edges - took care? 
 
-int** Puzzle::Solve()
+Table Puzzle::Solve()
 {
-	//initTable();
-	//solverec(i,j,table);
+	int i, ret;
+	int size = m_iNumOfElements;
+
+	for(i = 0; i < size; i++) {
+		if (size % i == 0) {
+			Table table(i+2, size/i+2); //+2 for margins of size 1
+			table.setFrame(-1);
+			ret = solveRec(1, 1, table);
+			if (ret == 0)
+				return table;
+		}
+	}
 	return NULL;
 }
 
@@ -215,41 +224,12 @@ int Puzzle::preProcess()
 	return 0;
 }
 
-int** Puzzle::initTable()
+int** Puzzle::setTable()
 {
-	size_t rows = m_iNumOfRows;
-	size_t cols = m_iNumOfCols;
-	int** res = new int*[rows];
-	unsigned int i;
-
-	for (i=0; i<m_iNumOfElements; i++)
-	{
-		res[i] = new int[cols];
-	}
-
-	for (i = 0; i < rows; i++)
-	{
-		res[(*m_vParts)[i].getRow()][(*m_vParts)[i].getCol()] = (*m_vParts)[i].getId();
-	}
-
-	return res;
 }
 
 
-int Puzzle::print()
+void Puzzle::print()
 {
-	int** final = Puzzle::initTable();
-	unsigned int i, j;
-
-	for (i = 0; i < sizeof(final); i++) //rows
-	{
-		for (j = 0; j < sizeof(final[0]); j++) //cols
-		{
-			*fout << final[i][j] << " ";
-		}
-		*fout << endl;
-	}
-
-	return 0;
 }
 
