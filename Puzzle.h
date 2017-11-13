@@ -26,9 +26,13 @@ public:
 	void setOutputStream(std::ofstream* f) { fout = f; }
 	std::vector<Part>* getParts() { return m_vParts; }
 
+	bool isValidStraightEdges(int sizei, int sizej);
+
+
 	/*
 	 * Creates an unsolved Puzzle out of input file path
 	 * @param input: input file to read from
+	 * @return 0 for success
 	 */
 	int init(std::string input);
 

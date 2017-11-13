@@ -10,6 +10,7 @@ using std::getline;
 using std::string;
 using std::cout;
 using std::endl;
+using std::pair;
 
 Part framePart(-1);
 
@@ -30,10 +31,11 @@ int Puzzle::init(std::string path)
 	size_t pos;
 	string line, token;
 	std::ifstream input;
-	std::vector<string> wrongIds, wrongFormats, missingIds;
+	std::vector<string> wrongIds, missingIds;
+	std::vector<pair<int, string>> wrongFormats;
 	input.open(path);
 	if (!input.is_open()) {
-		perror("Failed to open input file\n");
+		cout << "Failed to open input file" << endl;
 		return -EINVAL;
 	}
 
@@ -43,7 +45,7 @@ int Puzzle::init(std::string path)
 		token = line.substr(0, pos);
 		if (token.length() < 11 ||
 			token.compare(0, 11, "NumElements")) {
-			perror("Invalid first line in input file\n");
+			cout << "Invalid first line in input file" << endl;
 			rc = -EINVAL;
 		} else
 			line.erase(0, pos + 1);
@@ -53,7 +55,7 @@ int Puzzle::init(std::string path)
 
 		buf >> m_iNumOfElements;
 		if (m_iNumOfElements < 1) {
-			perror("Invalid NumOfElements\n");
+			cout << "Invalid NumOfElements" << endl;
 		}
 	}
 	std::vector<Part> *Parts = new std::vector<Part>(m_iNumOfElements);
@@ -62,52 +64,52 @@ int Puzzle::init(std::string path)
 		int id, left, up, right, down, eol;
 		std::istringstream iss;
 		iss.str(line);
-		cout << "line: " << line << endl;
 
 		iss >> id;
 		if(iss.fail()) {
-			wrongFormats.emplace_back(line);
+			wrongIds.emplace_back(std::to_string(id));
 			rc = -1;
 			continue;
 		}
 
+		if (id <= 0 || id > (int)m_iNumOfElements) {
+			wrongIds.emplace_back(std::to_string(id));
+			rc = -1;
+			continue;
+		}
+
+
 		iss >> left;
 		if(iss.fail()) {
-			wrongFormats.emplace_back(line);
+			wrongFormats.emplace_back(make_pair(id, line));
 			rc = -1;
 			continue;
 		}
 	
 		iss >> up;
 		if(iss.fail()) {
-			wrongFormats.emplace_back(line);
+			wrongFormats.emplace_back(make_pair(id, line));
 			rc = -1;
 			continue;
 		}
 	
 		iss >> right;
 		if(iss.fail()) {
-			wrongFormats.emplace_back(line);
+			wrongFormats.emplace_back(make_pair(id, line));
 			rc = -1;
 			continue;
 		}
 	
 		iss >> down;
 		if(iss.fail()) {
-			wrongFormats.emplace_back(line);
+			wrongFormats.emplace_back(make_pair(id, line));
 			rc = -1;
 			continue;
 		}
 	
 		iss >> eol;
 		if(!iss.fail() || !iss.eof()) {
-			wrongFormats.emplace_back(line);
-			rc = -1;
-			continue;
-		}
-	
-		if(id <= 0 || id > (int)m_iNumOfElements) {
-			wrongIds.emplace_back(std::to_string(id));
+			wrongFormats.emplace_back(make_pair(id, line));
 			rc = -1;
 			continue;
 		}
@@ -125,31 +127,55 @@ int Puzzle::init(std::string path)
 
 	if ((int)missingIds.size() > 0)
 	{
-		cout << "Missing puzzle element(s) with the following IDs: ";
+		*fout << "Missing puzzle element(s) with the following IDs: ";
 		for (int i = 0; i < (int)missingIds.size(); i++)
 		{
-			string deli = (i == (int)missingIds.size() - 1) ?
-				"" : ", ";
-			cout << missingIds[i] << deli;
+			string deli = 
+				(i == (int)missingIds.size() - 1) ? "" : ", ";
+			*fout << missingIds[i] << deli;
 		}
-		cout << endl;
+		*fout << endl;
 	}
 
-	*fout << "Puzzle of size <SIZE> cannot have the following IDs: ";
-	for(string s : wrongIds)
-		*fout << s << ", ";
-	*fout << endl;
-	
-	for (string s : wrongFormats)
+	if ((int)wrongIds.size() > 0)
 	{
-		*fout << "Puzzle ID " ;
-		*fout << s;
-		*fout << " has wrong data: "<< endl;
+		*fout << "Puzzle of size " << m_iNumOfElements << " cannot have the following IDs: ";
+		for (int i = 0; i < (int)wrongIds.size(); i++)
+		{
+			string deli =
+				(i == (int)wrongIds.size() - 1) ? "" : ", ";
+			*fout << wrongIds[i] << deli;
+		}
+		*fout << endl;
+	}
+
+	for (const pair<int, string> &line : wrongFormats)
+	{
+		*fout << "Puzzle ID " << line.first << " has wrong data: " << line.second << endl;
 	}
 	m_vParts = Parts;
 	return rc;
 }
 
+
+bool Puzzle::isValidStraightEdges(int sizei, int sizej)
+{
+	int leftStraight = 0;
+	int topStraight = 0;
+	for (size_t i = 0; i < m_iNumOfElements; i++)
+	{		
+		int left = (*m_vParts)[i].getLeft();
+		int top = (*m_vParts)[i].getTop();
+
+		if (left == 0)
+			leftStraight++;
+		if (top == 0)
+			topStraight++;
+	}
+	if (leftStraight < sizei || topStraight < sizej)
+		return false;
+	return true;
+}
 
 int Puzzle::solveRec(size_t i, size_t j, Table& tab)//Table& table
 {
@@ -162,7 +188,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)//Table& table
 		assert(table[i - 1][j]); //  top edge of the frame - false when 0
 		assert(table[i][j-1]);  //	left edge of the frame - false when 0
 	
-		//We always check the left and top directions - 
+		//We always check the top-left directions - 
 		//solve the puzzle from top-left to bottom-right
 		
 		if ((table[i - 1][j]) == -1) //the top frame 
@@ -251,9 +277,19 @@ Table Puzzle::Solve()
 	unsigned int i;
 	int ret;
 	unsigned int size = m_iNumOfElements;
+	bool straightEdges; 
 
 	for(i = 0; i < size; i++) {
 		if (size % i == 0) {
+			if (isValidStraightEdges(i, size / i))
+				straightEdges = true;
+			else
+			{
+				straightEdges = false;
+				*fout << "Cannot solve puzzle: wrong number of straight edges\n" << endl;
+				return Table();
+			}
+				
 			Table table(i, size/i, 1); 
 			table.setFrame(-1);
 			ret = solveRec(1, 1, table);
@@ -261,6 +297,7 @@ Table Puzzle::Solve()
 				return table;
 		}
 	}
+	*fout << "Cannot solve puzzle : it seems that there is no proper solution" << endl;
 	return Table();
 }
 

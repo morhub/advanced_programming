@@ -18,9 +18,10 @@ int main(int argc, char *argv[])
 	int rc = 0;
 
 	if (argc != 3) {
-		printf("Usage: %s <input_file> <output_file>\n", argv[0]);
+		cout << "Usage: " << argv[0] << " <input_file> <output_file>" << endl;
 		return -EINVAL;
 	}
+	///!!!!!!!!!!!!!!illegal folder error... ? 
 
 	std::ofstream output(argv[2]);
 
@@ -30,14 +31,14 @@ int main(int argc, char *argv[])
 
 	rc = puz->init(argv[1]);
 	if (rc) {
-		perror("Failed to init Puzzle\n");
+		cout << "Failed to init Puzzle" << endl;
 		return rc;
 
 	}
 
 	rc = puz->preProcess();
 	if (rc) {
-		perror("Failed in pre-Processing Stage\n");
+		cout << "Failed in pre-Processing Stage" << endl;
 		return rc;
 
 	}
@@ -48,9 +49,8 @@ int main(int argc, char *argv[])
 	else
 	{
 		rc = -1;
-		cout << "no solution" << endl;
+		cout << "no solution" << endl; ///!!!!!!!!delete
 	}
 	return rc;
-	
 }
 
