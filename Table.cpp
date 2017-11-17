@@ -86,3 +86,12 @@ void Table::clean(int x, int y) {
 		y = m_iMargin;
 	}
 }
+
+void Table::init()
+{
+	setFrame(-1);
+	for (int i = 1; i < m_iRows - 1; i++)
+		for (int j = 1; j < m_iCols-1; j++)
+			m_iTable[i][j] = 0;
+}
+

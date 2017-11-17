@@ -21,9 +21,12 @@ public:
 	int getMargin() { return m_iMargin; }
 	int getSize() { return m_iRows * m_iCols; }
 	int** getTable() {return m_iTable; }
-	void setFrame(int);
 	void print(std::ofstream&);
 	void clean(int x=0, int y=0);
+	void init();
+
+private:
+	void setFrame(int);
 
 };
 #endif

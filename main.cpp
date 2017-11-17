@@ -20,7 +20,6 @@ int main(int argc, char *argv[])
 		cout << "Usage: " << argv[0] << " <input_file> <output_file>" << endl;
 		return -1;
 	}
-	///!!!!!!!!!!!!!!illegal folder error... ? 
 
 	std::ofstream output(argv[2]);
 

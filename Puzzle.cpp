@@ -204,7 +204,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)//Table& table
 		}
 		else
 		{
-			if (!current.isConnectedTo((*m_vParts)[table[i - 1][j]], TOP))
+			if (!current.isConnectedTo((*m_vParts)[table[i - 1][j]-1], TOP))
 			{
 				isPartMatch = false;
 			}
@@ -220,13 +220,12 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)//Table& table
 		}
 		else
 		{
-			if (!current.isConnectedTo((*m_vParts)[table[i][j - 1]], LEFT))
+			if (!current.isConnectedTo((*m_vParts)[table[i][j - 1]-1], LEFT))
 			{
 				isPartMatch = false;
 			}
 		}
 		
-
 		if (table[i][j + 1] != 0) // right edge of the frame is here
 		{
 			if (!current.isConnectedTo(framePart, RIGHT))
@@ -297,18 +296,22 @@ Table Puzzle::Solve()
 			else
 			{
 				straightEdges = false;
-				*fout << "Cannot solve puzzle: wrong number of straight edges\n" << endl;
-				return Table();
+				continue;
 			}
 				
 			Table table(i, size/i, 1); 
-			table.setFrame(-1);
+			table.init();
 			ret = solveRec(1, 1, table);
 			if (ret == 0)
 				return table;
 		}
 	}
-	*fout << "Cannot solve puzzle : it seems that there is no proper solution" << endl;
+	if(!straightEdges)
+		*fout << "Cannot solve puzzle: wrong number of straight edges\n" << endl;
+
+	else
+		*fout << "Cannot solve puzzle : it seems that there is no proper solution" << endl;
+	
 	return Table();
 }
 
