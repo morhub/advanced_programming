@@ -12,10 +12,10 @@ Table::Table(unsigned int rows, unsigned int cols, unsigned int margins):
 {
 	unsigned int i;
 
-	if(rows > 0 && cols > 0) {
-		m_iTable = new int*[rows];
-		for (i = 0; i < rows; i++)
-			m_iTable[i] = new int[cols];
+	if(m_iRows > 0 && m_iCols > 0) {
+		m_iTable = new int*[m_iRows];
+		for (i = 0; i < m_iRows; i++)
+			m_iTable[i] = new int[m_iCols];
 	} else
 		m_iTable = NULL;
 }
@@ -32,19 +32,14 @@ Table::~Table()
 }
 
 Table::Table(const Table& table):
-	m_iRows(table.m_iRows),
-	m_iCols(table.m_iCols),
-	m_iMargin(table.m_iMargin)
+	Table(table.m_iRows - 2*table.m_iMargin,
+		  table.m_iCols - 2* table.m_iMargin,
+		  table.m_iMargin)
 {
 	unsigned int i, j;
-
-	if(m_iRows > 0 && m_iCols > 0) {
-		for(i = 0; i < table.m_iRows; i++)
-			for(j = 0; j < table.m_iCols; j++)
-				m_iTable[i][j] = table.m_iTable[i][j];
-	} else {
-		m_iTable = NULL;
-	}
+	for (i = 0; i < table.m_iRows; i++)
+		for (j = 0; j < table.m_iCols; j++)
+			m_iTable[i][j] = table.m_iTable[i][j];
 }
 
 
@@ -55,7 +50,7 @@ void Table::print(std::ofstream& fout)
 
 	for (i = m_iMargin; i < m_iRows-m_iMargin; i++) {
 		for (j = m_iMargin; j < m_iCols-m_iMargin; j++) {
-			if (i == m_iRows-m_iMargin - 1)
+			if (j == m_iCols - m_iMargin - 1)
 				deli = "\n";
 			else
 				deli = " ";
@@ -67,11 +62,19 @@ void Table::print(std::ofstream& fout)
 void Table::setFrame(int value=0) {
 	unsigned int i, j;
 
-	for (i = 0; i < m_iRows; i++)
-		m_iTable[i][0] = m_iTable[i][m_iRows-1] = value;
+	for (i = 0; i < m_iRows; i++) {
+		m_iTable[i][0] = value;
+		m_iTable[i][m_iCols - 1] = value;
+	}
 
-	for (j = 1; j < m_iCols-1; j++)
-		m_iTable[0][j] = m_iTable[m_iCols-1][j] = value;
+	for (j = 1; j < m_iCols - 1; j++) {
+		m_iTable[0][j] = value;
+		m_iTable[m_iRows - 1][j] = value;
+	}
+
+	for (i = 0; i < m_iRows; i++)
+		for (j = 0; j < m_iCols; j++)
+			printf("i,j: %u, %u, value: %d\n", i, j, m_iTable[i][j]);
 }
 
 void Table::clean(int x, int y) {

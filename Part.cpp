@@ -7,7 +7,8 @@ Part::Part(int id, int left, int top, int right, int bottom)
 	m_iTop = top;
 	m_iRight = right;
 	m_iBottom = bottom;
-	m_iRow = m_iCol = -1; ///Check this !!! 
+	m_iRow = m_iCol = -1;
+	taken = false;
 }
 
 bool Part::isConnectedTo(Part& other, direction dir)

@@ -177,6 +177,7 @@ bool Puzzle::isValidStraightEdges(int sizei, int sizej)
 	return true;
 }
 
+
 int Puzzle::solveRec(size_t i, size_t j, Table& tab)//Table& table
 {
 	bool isPartMatch = true;
@@ -185,6 +186,9 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)//Table& table
 	for(size_t k = 0; k < m_iNumOfElements; k++)
 	{
 		Part& current = (*m_vParts)[k];
+		if (current.isTaken())
+			continue;
+
 		assert(table[i - 1][j]); //  top edge of the frame - false when 0
 		assert(table[i][j-1]);  //	left edge of the frame - false when 0
 	
@@ -242,26 +246,33 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)//Table& table
 
 		if (isPartMatch) // this part is matched to the current place of the table
 		{
+			current.setTaken(true);
 			table[i][j] = current.getId();
 
 			//End of table
-			if ((i == tab.getCols() - 1) && (j == tab.getRows() - 1))
+			if ((i == tab.getRows() - 2) && (j == tab.getCols() - 2))
 				return 0; //solve succeeded
 
 			//End of line
-			if (i == tab.getCols() - 1)
+			if (j == tab.getCols() - 2)
 			{
 				if (solveRec(i + 1, 1, tab) == 0) //move to the next line, and first column
 					return 0;
 				else
+				{
+					current.setTaken(false);
 					continue;
+				}
 			}
-			else
+			else // "middle" cell in line
 			{
 				if (solveRec(i, j + 1, tab) == 0) //continue solving along the current line
 					return 0;
 				else
+				{
+					current.setTaken(false);
 					continue;
+				}
 			}
 		}
 		else
@@ -279,7 +290,7 @@ Table Puzzle::Solve()
 	unsigned int size = m_iNumOfElements;
 	bool straightEdges; 
 
-	for(i = 0; i < size; i++) {
+	for(i = 1; i < size; i++) {
 		if (size % i == 0) {
 			if (isValidStraightEdges(i, size / i))
 				straightEdges = true;

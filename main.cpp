@@ -9,7 +9,6 @@
 #include "Table.h"
 
 
-using std::perror;
 using std::cout;
 using std::endl;
 
@@ -19,7 +18,7 @@ int main(int argc, char *argv[])
 
 	if (argc != 3) {
 		cout << "Usage: " << argv[0] << " <input_file> <output_file>" << endl;
-		return -EINVAL;
+		return -1;
 	}
 	///!!!!!!!!!!!!!!illegal folder error... ? 
 
