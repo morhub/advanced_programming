@@ -71,16 +71,12 @@ void Table::setFrame(int value=0) {
 		m_iTable[0][j] = value;
 		m_iTable[m_iRows - 1][j] = value;
 	}
-
-	for (i = 0; i < m_iRows; i++)
-		for (j = 0; j < m_iCols; j++)
-			printf("i,j: %u, %u, value: %d\n", i, j, m_iTable[i][j]);
 }
 
 void Table::clean(int x, int y) {
 	unsigned int i, j;
 
-	for (i = x + m_iMargin; i < m_iRows - m_iMargin; i++) {
+	for (i = x; i < m_iRows - m_iMargin; i++) {
 		for (j = y; j < m_iCols - m_iMargin; j++)
 			m_iTable[i][j] = 0;	
 		y = m_iMargin;

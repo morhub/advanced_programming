@@ -47,7 +47,8 @@ int Puzzle::init(std::string path)
 			token.compare(0, 11, "NumElements")) {
 			cout << "Invalid first line in input file" << endl;
 			rc = -EINVAL;
-		} else
+		}
+		else
 			line.erase(0, pos + 1);
 
 		token = line.substr(line.find_first_not_of(" "), string::npos);
@@ -59,14 +60,14 @@ int Puzzle::init(std::string path)
 		}
 	}
 	std::vector<Part> *Parts = new std::vector<Part>(m_iNumOfElements);
-	
-	while (input && getline(input, line)) {
+
+	while (input && getline(input, line) && line.length()!=0) {
 		int id, left, up, right, down, eol;
 		std::istringstream iss;
 		iss.str(line);
 
 		iss >> id;
-		if(iss.fail()) {
+		if (iss.fail()) {
 			wrongIds.emplace_back(std::to_string(id));
 			rc = -1;
 			continue;
@@ -80,28 +81,28 @@ int Puzzle::init(std::string path)
 
 
 		iss >> left;
-		if(iss.fail()) {
+		if (iss.fail() || abs(left)>1 ) {
 			wrongFormats.emplace_back(make_pair(id, line));
 			rc = -1;
 			continue;
 		}
 	
 		iss >> up;
-		if(iss.fail()) {
+		if(iss.fail() || abs(up)>1) {
 			wrongFormats.emplace_back(make_pair(id, line));
 			rc = -1;
 			continue;
 		}
 	
 		iss >> right;
-		if(iss.fail()) {
+		if(iss.fail() || abs(right)>1) {
 			wrongFormats.emplace_back(make_pair(id, line));
 			rc = -1;
 			continue;
 		}
 	
 		iss >> down;
-		if(iss.fail()) {
+		if(iss.fail() || abs(down)>1) {
 			wrongFormats.emplace_back(make_pair(id, line));
 			rc = -1;
 			continue;
@@ -180,12 +181,12 @@ bool Puzzle::isValidStraightEdges(int sizei, int sizej)
 
 int Puzzle::solveRec(size_t i, size_t j, Table& tab)//Table& table
 {
-	bool isPartMatch = true;
 	int** table = tab.getTable(); 
 
 	for(size_t k = 0; k < m_iNumOfElements; k++)
 	{
 		Part& current = (*m_vParts)[k];
+		bool isPartMatch = true;
 		if (current.isTaken())
 			continue;
 
@@ -259,6 +260,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)//Table& table
 					return 0;
 				else
 				{
+					tab.getTable()[i][j] = 0;
 					current.setTaken(false);
 					continue;
 				}
@@ -269,6 +271,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)//Table& table
 					return 0;
 				else
 				{
+					tab.getTable()[i][j] = 0;
 					current.setTaken(false);
 					continue;
 				}
@@ -277,7 +280,8 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)//Table& table
 		else
 			continue;
 	}
-	tab.clean(i, j);
+//	tab.clean(i, j);
+	
 	return -1;
 
 }
@@ -289,7 +293,7 @@ Table Puzzle::Solve()
 	unsigned int size = m_iNumOfElements;
 	bool straightEdges; 
 
-	for(i = 1; i < size; i++) {
+	for(i = 1; i <= size; i++) {
 		if (size % i == 0) {
 			if (isValidStraightEdges(i, size / i))
 				straightEdges = true;
@@ -306,11 +310,8 @@ Table Puzzle::Solve()
 				return table;
 		}
 	}
-	if(!straightEdges)
-		*fout << "Cannot solve puzzle: wrong number of straight edges\n" << endl;
-
-	else
-		*fout << "Cannot solve puzzle : it seems that there is no proper solution" << endl;
+	
+	*fout << "Cannot solve puzzle : it seems that there is no proper solution" << endl;
 	
 	return Table();
 }
@@ -322,7 +323,11 @@ int Puzzle::preProcess()
 	int bottomStraight = 0;
 	int leftStraight = 0;
 	int rightStraight = 0;
-	bool tr, tl, br, bl = false;
+	bool tr = false;
+	bool tl = false;
+	bool br = false;
+	bool bl = false;
+	int ret = 0;
 
 	for (size_t i = 0; i < m_iNumOfElements; i++)
 	{
@@ -355,8 +360,11 @@ int Puzzle::preProcess()
 		sum += (*m_vParts)[i].getBottom();
 	}
 
-	if (topStraight != bottomStraight || leftStraight != rightStraight)
-		*fout <<  "Cannot solve puzzle: wrong number of straight edges\n" << endl;
+	if(!((topStraight==bottomStraight && topStraight!=0)&&(leftStraight == rightStraight && leftStraight!=0)))
+	{
+		*fout << "Cannot solve puzzle: wrong number of straight edges" << endl;
+		ret = -1;
+	}
 
 	if (tl == false)
 		*fout << "Cannot solve puzzle: missing corner element: TL" << endl;
@@ -370,5 +378,8 @@ int Puzzle::preProcess()
 	if (sum != 0)
 		*fout << "Cannot solve puzzle : sum of edges is not zero" << endl;
 
-	return 0;
+	if ((tl == false) || (tr == false) || (bl == false) || (br == false) || (sum != 0))
+		ret = -1;
+
+	return ret;
 }

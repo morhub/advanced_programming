@@ -29,26 +29,21 @@ int main(int argc, char *argv[])
 
 	rc = puz->init(argv[1]);
 	if (rc) {
-		cout << "Failed to init Puzzle" << endl;
 		return rc;
-
 	}
 
 	rc = puz->preProcess();
 	if (rc) {
-		cout << "Failed in pre-Processing Stage" << endl;
 		return rc;
-
 	}
 
 	Table table = puz->Solve();
 	if (table.getTable())
 		table.print(output);
 	else
-	{
 		rc = -1;
-		cout << "no solution" << endl; ///!!!!!!!!delete
-	}
+	
+
 	return rc;
 }
 

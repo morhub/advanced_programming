@@ -1,14 +1,5 @@
 #include "Part.h"
 
-
-/////delete!!!!!
-#include <fstream>
-#include <string>
-#include <cstring>
-#include <iostream>
-using namespace std;
-
-
 Part::Part(int id, int left, int top, int right, int bottom)
 {
 	m_iId = id;
@@ -31,8 +22,6 @@ bool Part::isConnectedTo(Part& other, direction dir)
 	case(TOP):
 		currentEdge = this->getTop();
 		otherEdge   = other.getBottom();
-		cout << "this top: " << this->getTop() << endl;
-		cout << "other bottom: " << other.getBottom() << endl;
 		break;
 	case(BOTTOM):
 		currentEdge = this->getBottom();
