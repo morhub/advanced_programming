@@ -11,6 +11,7 @@ enum direction {
 class Part
 {
 	int m_iId, m_iLeft, m_iTop, m_iRight, m_iBottom;
+	bool m_bCorner;
 
 public:
 	Part(int id=0, int left=0, int top=0, int right=0, int bottom=0);
@@ -20,6 +21,8 @@ public:
 	int getTop()				{ return m_iTop; }
 	int getRight()				{ return m_iRight; }
 	int getBottom()				{ return m_iBottom; }
+	bool isCorner()				{ return m_bCorner; }
+	void setCorner(bool b)		{ m_bCorner = b; }
 };
 
 #endif
