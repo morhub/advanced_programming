@@ -8,7 +8,6 @@
 
 using std::getline;
 using std::string;
-using std::cout;
 using std::endl;
 using std::pair;
 
@@ -60,7 +59,7 @@ int Puzzle::init(std::string path)
 	std::vector<pair<int, string>> wrongFormats;
 	input.open(path);
 	if (!input.is_open()) {
-		cout << "Failed to open input file" << endl;
+		*fout << "Failed to open input file" << endl;
 		return -EINVAL;
 	}
 
@@ -70,7 +69,7 @@ int Puzzle::init(std::string path)
 		token = line.substr(0, pos);
 		if (token.length() < 11 ||
 			token.compare(0, 11, "NumElements")) {
-			cout << "Invalid first line in input file" << endl;
+			*fout << "Invalid first line in input file" << endl;
 			rc = -EINVAL;
 		}
 		else
@@ -81,7 +80,7 @@ int Puzzle::init(std::string path)
 
 		buf >> m_iNumOfElements;
 		if (m_iNumOfElements < 1) {
-			cout << "Invalid NumOfElements" << endl;
+			*fout << "Invalid NumOfElements" << endl;
 		}
 	}
 	std::vector<Part> *Parts = new std::vector<Part>(m_iNumOfElements);
