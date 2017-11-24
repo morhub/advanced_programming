@@ -207,26 +207,21 @@ bool Puzzle::isValidStraightEdges(int sizei, int sizej)
 }
 
 
-int Puzzle::solveRec(size_t i, size_t j, Table& tab)//Table& table
+int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 {
 	int** table = tab.getTable(); 
-
-
-	assert(table[i - 1][j]);   // top edge of the frame  - false when 0
-	assert(table[i][j - 1]);  //  left edge of the frame - false when 0
-
-
+	
 	int leftpeek, toppeek, rightpeek, bottompeek;
 	rightpeek = bottompeek = -2; //there is no part to the right/bottom
 	leftpeek  = toppeek    = 0; //there is a frame part to the left/top
 	
-	if (table[i][j - 1] >= 0)
+	if (j > 0 && table[i][j - 1] >= 0)
 		leftpeek = 0-((*m_vParts)[table[i][j - 1] - 1].getRight());
-	if (table[i - 1][j] >= 0)
+	if (i > 0 && table[i - 1][j] >= 0)
 		toppeek =  0-((*m_vParts) [table[i-1][j]-1].getBottom());
-	if(table[i][j + 1] != 0) //not empty
+	if(j < (size_t)tab.getCols() - 1 && table[i][j + 1] != 0) //not empty
 		rightpeek = 0;
-	if (table[i+1][j] != 0) //not empty
+	if (i < (size_t)tab.getRows() - 1 && table[i+1][j] != 0) //not empty
 		bottompeek = 0;
 
 	map<pair<int, int>, list<Part>*> currentMap= m_mPartMap[make_pair(leftpeek, toppeek)];
@@ -251,21 +246,19 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)//Table& table
 		Part current = m.second->front();
 		m.second->pop_front();
 		table[i][j] = current.getId();
-
-
-
+		
 		//End of table
-		if ((i == tab.getRows() - 2) && (j == tab.getCols() - 2))
+		if ((i == tab.getRows() - 1) && (j == tab.getCols() - 1))
 			return 0; //solve succeeded
 
 		//End of line
-		if (j == tab.getCols() - 2)
+		if (j == tab.getCols() - 1)
 		{
-			if (solveRec(i + 1, 1, tab) == 0) //move to the next line, and first column
+			if (solveRec(i + 1, 0, tab) == 0) //move to the next line, and first column
 				return 0;
 			else
 			{
-				tab.getTable()[i][j] = 0;
+				table[i][j] = 0;
 				m.second->push_back(current);
 				continue;
 			}
@@ -276,15 +269,13 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)//Table& table
 				return 0;
 			else
 			{
-				tab.getTable()[i][j] = 0;
+				table[i][j] = 0;
 				m.second->push_back(current);
 				continue;
 			}
 		}
-
 	}
 	return -1;
-
 }
 
 Table Puzzle::Solve()
@@ -304,9 +295,8 @@ Table Puzzle::Solve()
 				continue;
 			}
 				
-			Table table(i, size/i, 1); 
-			table.init();
-			ret = solveRec(1, 1, table);
+			Table table(i, size/i); 
+			ret = solveRec(0, 0, table);
 			if (ret == 0)
 				return table;
 		}
