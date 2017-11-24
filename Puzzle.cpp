@@ -12,17 +12,42 @@ using std::cout;
 using std::endl;
 using std::pair;
 
-Part framePart(-1);
 
 Puzzle::Puzzle() 
 {
 	m_vParts = NULL;
+	for (int i = -1; i < 2; i++)
+	{
+		for (int j = -1; j < 2; j++)
+		{
+			for (int k = -1; k < 2; k++)
+			{
+				for (int s = -1; s < 2; s++)
+				{
+					m_mPartMap[make_pair(i, j)][make_pair(k, s)] = new list<Part>();
+				}
+			}
+		}
+	}      
 }
 
 Puzzle::~Puzzle()
 {
 	if (m_vParts)
 		delete m_vParts;
+	for (int i = -1; i < 2; i++)
+	{
+		for (int j = -1; j < 2; j++)
+		{
+			for (int k = -1; k < 2; k++)
+			{
+				for (int s = -1; s < 2; s++)
+				{
+					delete m_mPartMap[make_pair(i, j)][make_pair(k, s)];
+				}
+			}
+		}
+	}
 }
 
 int Puzzle::init(std::string path)
@@ -116,6 +141,8 @@ int Puzzle::init(std::string path)
 		}
 
 		Parts->at(id-1) = Part(id, left, up, right, down);
+
+
 	}
 
 	for (int i = 0; i < (int)Parts->size(); i++) {
@@ -125,6 +152,7 @@ int Puzzle::init(std::string path)
 			rc = -1;
 		}
 	}
+
 
 	if ((int)missingIds.size() > 0)
 	{
@@ -183,105 +211,78 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)//Table& table
 {
 	int** table = tab.getTable(); 
 
-	for(size_t k = 0; k < m_iNumOfElements; k++)
+
+	assert(table[i - 1][j]);   // top edge of the frame  - false when 0
+	assert(table[i][j - 1]);  //  left edge of the frame - false when 0
+
+
+	int leftpeek, toppeek, rightpeek, bottompeek;
+	rightpeek = bottompeek = -2; //there is no part to the right/bottom
+	leftpeek  = toppeek    = 0; //there is a frame part to the left/top
+	
+	if (table[i][j - 1] >= 0)
+		leftpeek = 0-((*m_vParts)[table[i][j - 1] - 1].getRight());
+	if (table[i - 1][j] >= 0)
+		toppeek =  0-((*m_vParts) [table[i-1][j]-1].getBottom());
+	if(table[i][j + 1] != 0) //not empty
+		rightpeek = 0;
+	if (table[i+1][j] != 0) //not empty
+		bottompeek = 0;
+
+	map<pair<int, int>, list<Part>*> currentMap= m_mPartMap[make_pair(leftpeek, toppeek)];
+	
+	//We always check the top-left directions - 
+	//solve the puzzle from top-left to bottom-right
+	for (auto const &m : currentMap)
 	{
-		Part& current = (*m_vParts)[k];
-		bool isPartMatch = true;
-		if (current.isTaken())
+		//no parts of this left-top edges are avilable
+		if (m.second->empty())
+			continue;
+		
+		//this is not the apropriate right-edge list of parts 
+		if (rightpeek > -2 && rightpeek != m.first.first)
 			continue;
 
-		assert(table[i - 1][j]); //  top edge of the frame - false when 0
-		assert(table[i][j-1]);  //	left edge of the frame - false when 0
-	
-		//We always check the top-left directions - 
-		//solve the puzzle from top-left to bottom-right
-		
-		if ((table[i - 1][j]) == -1) //the top frame 
-		{
-			if (!current.isConnectedTo(framePart, TOP))
-			{
-				isPartMatch = false;
-			}
-		}
-		else
-		{
-			if (!current.isConnectedTo((*m_vParts)[table[i - 1][j]-1], TOP))
-			{
-				isPartMatch = false;
-			}
-		}
-		
-
-		if (table[i][j - 1] == -1) // the left frame
-		{
-			if (!current.isConnectedTo(framePart, LEFT))
-			{
-				isPartMatch = false;
-			}
-		}
-		else
-		{
-			if (!current.isConnectedTo((*m_vParts)[table[i][j - 1]-1], LEFT))
-			{
-				isPartMatch = false;
-			}
-		}
-		
-		if (table[i][j + 1] != 0) // right edge of the frame is here
-		{
-			if (!current.isConnectedTo(framePart, RIGHT))
-			{
-				isPartMatch = false;
-			}
-		}
-
-
-		if (table[i+1][j] != 0) // bottom edge of the frame is here
-		{
-			if (!current.isConnectedTo(framePart, BOTTOM))
-			{
-				isPartMatch = false;
-			}
-		}
-
-		if (isPartMatch) // this part is matched to the current place of the table
-		{
-			current.setTaken(true);
-			table[i][j] = current.getId();
-
-			//End of table
-			if ((i == tab.getRows() - 2) && (j == tab.getCols() - 2))
-				return 0; //solve succeeded
-
-			//End of line
-			if (j == tab.getCols() - 2)
-			{
-				if (solveRec(i + 1, 1, tab) == 0) //move to the next line, and first column
-					return 0;
-				else
-				{
-					tab.getTable()[i][j] = 0;
-					current.setTaken(false);
-					continue;
-				}
-			}
-			else // "middle" cell in line
-			{
-				if (solveRec(i, j + 1, tab) == 0) //continue solving along the current line
-					return 0;
-				else
-				{
-					tab.getTable()[i][j] = 0;
-					current.setTaken(false);
-					continue;
-				}
-			}
-		}
-		else
+		//this is not the apropriate bottom-edge list of parts 
+		if (bottompeek > -2 && bottompeek != m.first.second)
 			continue;
+
+		//if we got so far, we have match in this list - continue checking this part
+		Part current = m.second->front();
+		m.second->pop_front();
+		table[i][j] = current.getId();
+
+
+
+		//End of table
+		if ((i == tab.getRows() - 2) && (j == tab.getCols() - 2))
+			return 0; //solve succeeded
+
+		//End of line
+		if (j == tab.getCols() - 2)
+		{
+			if (solveRec(i + 1, 1, tab) == 0) //move to the next line, and first column
+				return 0;
+			else
+			{
+				tab.getTable()[i][j] = 0;
+				m.second->push_back(current);
+				continue;
+			}
+		}
+		else // "middle" cell in line
+		{
+			if (solveRec(i, j + 1, tab) == 0) //continue solving along the current line
+				return 0;
+			else
+			{
+				tab.getTable()[i][j] = 0;
+				m.second->push_back(current);
+				continue;
+			}
+		}
+
 	}
-//	tab.clean(i, j);
-	
 	return -1;
 
 }
@@ -382,4 +383,20 @@ int Puzzle::preProcess()
 		ret = -1;
 
 	return ret;
+}
+
+
+void Puzzle::initPartsMap()
+{
+	int l, t, r, b;
+	for (size_t i = 0; i < m_iNumOfElements; i++)
+	{
+		Part& p = m_vParts->at(i);
+		l = p.getLeft();
+		t = p.getTop();
+		r = p.getRight();
+		b = p.getBottom();
+
+		m_mPartMap[make_pair(l,t)][make_pair(r,b)]->push_back(p);
+	}
 }

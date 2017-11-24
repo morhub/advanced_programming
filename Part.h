@@ -1,6 +1,6 @@
 #ifndef PART_H
 #define PART_H
-//
+
 enum direction {
 	LEFT,
 	TOP,
@@ -11,8 +11,6 @@ enum direction {
 class Part
 {
 	int m_iId, m_iLeft, m_iTop, m_iRight, m_iBottom;
-	int m_iRow, m_iCol;
-	bool taken;
 
 public:
 	Part(int id=0, int left=0, int top=0, int right=0, int bottom=0);
@@ -22,28 +20,6 @@ public:
 	int getTop()				{ return m_iTop; }
 	int getRight()				{ return m_iRight; }
 	int getBottom()				{ return m_iBottom; }
-	int getRow()				{ return m_iRow; }
-	int getCol()				{ return m_iCol; }
-	bool isTaken()				{ return taken; }
-	void setTaken(bool val)		{ taken = val; }
-	void setRow(int row)		{ m_iRow  = row; }
-	void setCol(int col)		{ m_iCol = col; }
-	
-	/*
-		
-		
-	*/
-	bool isConnectedTo(Part& other, direction dir);
-//private:
-	//rotate
-
 };
-
-
-
-
-
-
-
 
 #endif

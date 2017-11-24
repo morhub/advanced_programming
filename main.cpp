@@ -37,6 +37,8 @@ int main(int argc, char *argv[])
 		return rc;
 	}
 
+	puz->initPartsMap();
+
 	Table table = puz->Solve();
 	if (table.getTable())
 		table.print(output);

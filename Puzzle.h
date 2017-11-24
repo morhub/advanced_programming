@@ -8,12 +8,17 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <map>
+#include<list>
+using namespace std;
+
 
 class Puzzle
 {
-	std::vector<Part> *m_vParts;
+	vector<Part> *m_vParts;
 	size_t m_iNumOfElements;
-	std::ofstream* fout;
+	ofstream* fout;
+	map<pair<int, int>, map<pair<int, int>, list<Part>*>> m_mPartMap;
 
 public:
 	Puzzle();
@@ -52,6 +57,17 @@ public:
 	*returns 0 on success 
 	*/
 	int preProcess();
+
+
+	/*
+	* A data structure which contains:
+	* 1- a map of <left, top> keys, the value is:
+	* 2- a map of <right, bottom> keys, the value is:
+	* 3- list of parts that has the edges of the keys indexes
+	* 
+	*/
+	void initPartsMap();
+
 
 private:
 	int solveRec(size_t i, size_t j, Table& tab);
