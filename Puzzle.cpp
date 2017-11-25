@@ -264,11 +264,11 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 		table[i][j] = current.getId();
 		
 		//End of table
-		if ((i == tab.getRows() - 1) && (j == tab.getCols() - 1))
+		if ((i == (size_t)tab.getRows() - 1) && (j == (size_t)tab.getCols() - 1))
 			return 0; //solve succeeded
 
 		//End of line
-		if (j == tab.getCols() - 1)
+		if (j == (size_t)tab.getCols() - 1)
 		{
 			if (solveRec(i + 1, 0, tab) == 0) //move to the next line, and first column
 				return 0;
@@ -299,17 +299,11 @@ Table Puzzle::Solve()
 	unsigned int i;
 	int ret;
 	unsigned int size = m_iNumOfElements;
-	bool straightEdges; 
 
 	for(i = 1; i <= size; i++) {
 		if (size % i == 0) {
-			if (isValidStraightEdges(i, size / i))
-				straightEdges = true;
-			else
-			{
-				straightEdges = false;
+			if (!isValidStraightEdges(i, size / i))
 				continue;
-			}
 				
 			Table table(i, size/i); 
 			ret = solveRec(0, 0, table);

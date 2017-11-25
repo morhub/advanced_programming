@@ -7,7 +7,7 @@
 #include <iostream>
 #include "Puzzle.h"
 #include "Table.h"
-#include <windows.h>
+//#include <windows.h>
 
 using std::cout;
 using std::endl;
@@ -20,16 +20,6 @@ int main(int argc, char *argv[])
 		cout << "Usage: " << argv[0] << " <input_file> <output_file>" << endl;
 		return -1;
 	}
-
-	LARGE_INTEGER frequency;        // ticks per second
-	LARGE_INTEGER t1, t2;           // ticks
-	double elapsedTime;
-
-	// get ticks per second
-	QueryPerformanceFrequency(&frequency);
-
-	// start timer
-	QueryPerformanceCounter(&t1);
 
 	std::ofstream output(argv[2]);
 
@@ -55,14 +45,6 @@ int main(int argc, char *argv[])
 	else
 		rc = -1;
 	
-
-	// stop timer
-	QueryPerformanceCounter(&t2);
-
-	// compute and print the elapsed time in millisec
-	elapsedTime = (t2.QuadPart - t1.QuadPart) * 1000.0 / frequency.QuadPart;
-	cout << "time: " << elapsedTime << endl;
-
 	return rc;
 }
 
