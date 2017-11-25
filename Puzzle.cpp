@@ -341,32 +341,27 @@ bool Puzzle::cornerCheck(bool &tr, bool &tl, bool &br, bool &bl)
 		Part& pi = (*m_vParts)[i];
 		if (pi.getTop() == 0 && pi.getRight() == 0)
 		{
-//			tr = true;
 			pi.setCorner(true);
 			for (size_t j = 0; j < m_iNumOfElements; j++)
 			{
 				Part& pj = (*m_vParts)[j];
 				if (!pj.isCorner() && pj.getTop() == 0 && pj.getLeft() == 0)
 				{
-//					tl = true;
 					pj.setCorner(true);
 					for (size_t k = 0; k < m_iNumOfElements; k++)
 					{
 						Part& pk = (*m_vParts)[k];
 						if (!pk.isCorner() && pk.getBottom() == 0 && pk.getRight() == 0)
 						{
-//							br = true;
 							pk.setCorner(true);
 							for (size_t m = 0; m < m_iNumOfElements; m++)
 							{
 								Part& pm = (*m_vParts)[m];
 								if (!pm.isCorner() && pm.getBottom() == 0 && pm.getLeft() == 0)
 								{
-//									bl = true;
 									pm.setCorner(true);
 									return true;
 								}
-
 							}
 							pk.setCorner(false);
 						}
@@ -449,7 +444,6 @@ bool Puzzle::cornerCheck(bool &tr, bool &tl, bool &br, bool &bl)
 			continue;
 		}
 	}
-
 	return false;
 }
 
