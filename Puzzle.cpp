@@ -471,7 +471,10 @@ int Puzzle::preProcess()
 	}
 
 	if (sum != 0)
+	{
 		*fout << "Cannot solve puzzle : sum of edges is not zero" << endl;
+		ret = -1;
+	}
 
 	return ret;
 }
