@@ -30,7 +30,7 @@ public:
 
 	void setOutputStream(std::ofstream* f) { fout = f; }
 	std::vector<Part>* getParts() { return m_vParts; }
-	void cornerCheck(bool &tr, bool &tl, bool &br, bool &bl, bool &general, bool &line, bool &col);
+	bool cornerCheck(bool &tr, bool &tl, bool &br, bool &bl);
 	bool isValidStraightEdges(int sizei, int sizej);
 
 

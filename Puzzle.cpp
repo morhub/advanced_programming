@@ -306,105 +306,113 @@ Table Puzzle::Solve()
 	return Table();
 }
 
-void Puzzle::cornerCheck(bool &tr, bool &tl, bool &br, bool &bl, bool &general, bool &line, bool &col)
+bool Puzzle::cornerCheck(bool &tr, bool &tl, bool &br, bool &bl)
 {
-	//the regular case - 4 corner parts
+	//the easy case - only one element
+	if (m_iNumOfElements == 1) {
+		Part& p = (*m_vParts)[0];
+		tr = p.getTop() == 0 && p.getRight() == 0;
+		tl = p.getTop() == 0 && p.getLeft() == 0;
+		br = p.getBottom() == 0 && p.getRight() == 0;
+		bl = p.getBottom() == 0 && p.getLeft() == 0;
+		return (tr && tl && br && bl);
+	}
+
+	//the regular case - different 4 corner parts
 	for (size_t i = 0; i < m_iNumOfElements; i++)
 	{
-		if ((!((*m_vParts)[i].isCorner())) && (((*m_vParts)[i].getTop() == 0) && ((*m_vParts)[i].getRight() == 0)))
+		Part& pi = (*m_vParts)[i];
+		if (pi.getTop() == 0 && pi.getRight() == 0)
 		{
-			(*m_vParts)[i].setCorner(true);
 			tr = true;
+			pi.setCorner(true);
 			for (size_t j = 0; j < m_iNumOfElements; j++)
 			{
-				if ((!((*m_vParts)[j].isCorner())) && (((*m_vParts)[j].getTop() == 0) && ((*m_vParts)[j].getLeft() == 0)))
+				Part& pj = (*m_vParts)[j];
+				if (!pj.isCorner() && pj.getTop() == 0 && pj.getLeft() == 0)
 				{
-					(*m_vParts)[j].setCorner(true);
 					tl = true;
+					pj.setCorner(true);
 					for (size_t k = 0; k < m_iNumOfElements; k++)
 					{
-						if ((!((*m_vParts)[k].isCorner())) && (((*m_vParts)[k].getBottom() == 0) && ((*m_vParts)[k].getRight() == 0)))
+						Part& pk = (*m_vParts)[k];
+						if (!pk.isCorner() && pk.getBottom() == 0 && pk.getRight() == 0)
 						{
-							(*m_vParts)[k].setCorner(true);
 							br = true;
+							pk.setCorner(true);
 							for (size_t m = 0; m < m_iNumOfElements; m++)
 							{
-								if ((!((*m_vParts)[m].isCorner())) && (((*m_vParts)[m].getBottom() == 0) && ((*m_vParts)[m].getLeft() == 0)))
+								Part& pm = (*m_vParts)[m];
+								if (!pm.isCorner() && pm.getBottom() == 0 && pm.getLeft() == 0)
 								{
-									(*m_vParts)[m].setCorner(true);
 									bl = true;
+									pm.setCorner(true);
+									return true;
 								}
 
 							}
-
+							pk.setCorner(false);
 						}
 					}
+					pj.setCorner(false);
 				}
 			}
-
+			pi.setCorner(false);
 		}
-
-		if (tl && tr && br && bl)
-			general = true;
-		//clean...
-		for (size_t i = 0; i < m_iNumOfElements; i++)
-			(*m_vParts)[i].setCorner(false);
-
-		//the line case - 2 corner parts
-		for (size_t i = 0; i < m_iNumOfElements; i++)
-		{
-			if ((!((*m_vParts)[i].isCorner())) &&
-				(((*m_vParts)[i].getTop() == 0) && ((*m_vParts)[i].getRight() == 0)) && ((*m_vParts)[i].getBottom() == 0))
-			{
-				tr = true; 
-				br = true;
-				(*m_vParts)[i].setCorner(true);
-				for (size_t j = 0; j < m_iNumOfElements; j++)
-				{
-					if((!((*m_vParts)[j].isCorner())) &&
-						(((*m_vParts)[j].getTop() == 0) && ((*m_vParts)[j].getLeft() == 0)) && ((*m_vParts)[j].getBottom() == 0))
-					{
-						tl = true;
-						bl = true;
-						(*m_vParts)[j].setCorner(true);
-						break;
-					}
-				}
-			}
-		}
-
-		if (tl && tr && br && bl)
-			line = true;
-		//clean...
-		for (size_t i = 0; i < m_iNumOfElements; i++)
-			(*m_vParts)[i].setCorner(false);
-
-		//the column case - 2 corner parts
-		for (size_t i = 0; i < m_iNumOfElements; i++)
-		{
-			if ((!((*m_vParts)[i].isCorner())) &&
-				(((*m_vParts)[i].getLeft() == 0) && ((*m_vParts)[i].getTop() == 0)) && ((*m_vParts)[i].getRight() == 0))
-			{
-				tr = true;
-				tl = true;
-				(*m_vParts)[i].setCorner(true);
-				for (size_t j = 0; j < m_iNumOfElements; j++)
-				{
-					if ((!((*m_vParts)[j].isCorner())) &&
-						(((*m_vParts)[j].getLeft() == 0) && ((*m_vParts)[j].getBottom() == 0)) && ((*m_vParts)[j].getRight() == 0))
-					{
-						br = true;
-						bl = true;
-						(*m_vParts)[j].setCorner(true);
-						break;
-					}
-				}
-			}
-		}
-
-		if (tl && tr && br && bl)
-			col = true;
 	}
+
+	//the row case - 2 corner parts
+	for (size_t i = 0; i < m_iNumOfElements; i++)
+		{
+			Part& pi = (*m_vParts)[i];
+
+			//if a single part isn't straight on top/bottom, it will fail
+			if (pi.getTop() != 0 || pi.getBottom() != 0)
+				break;
+
+			if (pi.getRight() == 0)
+			{
+				pi.setCorner(true);
+				for (size_t j = 0; j < m_iNumOfElements; j++)
+				{
+					Part& pj = (*m_vParts)[j];
+					if(!pj.isCorner() && pj.getLeft() == 0)
+					{
+						pj.setCorner(true);
+						return true;
+					}
+				}
+				pi.setCorner(false);
+			}
+		}
+
+	//the col case - 2 corner parts
+	for (size_t i = 0; i < m_iNumOfElements; i++)
+		{
+			Part& pi = (*m_vParts)[i];
+
+			//if a single part isn't straight on right/left, it will fail
+			if (pi.getLeft() != 0 || pi.getRight() != 0)
+				break;
+
+			if (pi.getTop() == 0)
+			{
+				pi.setCorner(true);
+				for (size_t j = 0; j < m_iNumOfElements; j++)
+				{
+					Part& pj = (*m_vParts)[j];
+					if (!pj.isCorner() && pj.getBottom() == 0)
+					{
+						pj.setCorner(true);
+						return true;
+					}
+				}
+				pi.setCorner(false);
+			}
+		}
+
+	// if we got so far, it means there is no available solution!
+	return false;
 }
 
 
@@ -419,11 +427,6 @@ int Puzzle::preProcess()
 	bool tl = false;
 	bool br = false;
 	bool bl = false;
-	bool regularCaseCorners = false;
-	bool lineCaseCorners = false;
-	bool colCaseCorners = false;
-
-
 	int ret = 0;
 
 	for (size_t i = 0; i < m_iNumOfElements; i++)
@@ -442,17 +445,6 @@ int Puzzle::preProcess()
 		if (bottom == 0)
 			bottomStraight++;
 
-		Puzzle::cornerCheck(tr, tl, br, bl, regularCaseCorners, lineCaseCorners, colCaseCorners);
-
-		/*if (top == 0 && right == 0)
-			tr = true;
-		if (top == 0 && left == 0)
-			tl = true;
-		if (bottom == 0 && right == 0)
-			br = true;
-		if (bottom == 0 && left == 0)
-			bl = true;*/
-
 		sum += (*m_vParts)[i].getLeft();
 		sum += (*m_vParts)[i].getTop();
 		sum += (*m_vParts)[i].getRight();
@@ -465,8 +457,9 @@ int Puzzle::preProcess()
 		ret = -1;
 	}
 
-	if (!regularCaseCorners && !lineCaseCorners && !colCaseCorners)
-	{	
+	if (Puzzle::cornerCheck(tr, tl, br, bl) == false) 
+	{
+		ret = -1;
 		if (tl == false)
 			*fout << "Cannot solve puzzle: missing corner element: TL" << endl;
 		if (tr == false)
@@ -479,9 +472,6 @@ int Puzzle::preProcess()
 
 	if (sum != 0)
 		*fout << "Cannot solve puzzle : sum of edges is not zero" << endl;
-
-	if ((tl == false) || (tr == false) || (bl == false) || (br == false) || (sum != 0))
-		ret = -1;
 
 	return ret;
 }
