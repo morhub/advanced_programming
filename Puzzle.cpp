@@ -4,12 +4,13 @@
 #include <iostream>
 #include <assert.h> 
 #include "Puzzle.h"
-
+#include <algorithm>
 
 using std::getline;
 using std::string;
 using std::endl;
 using std::pair;
+
 
 
 Puzzle::Puzzle() 
@@ -155,14 +156,30 @@ int Puzzle::init(std::string path)
 
 	if ((int)missingIds.size() > 0)
 	{
-		*fout << "Missing puzzle element(s) with the following IDs: ";
+		bool printEndl = false; 
+		bool firstRound = true;
 		for (int i = 0; i < (int)missingIds.size(); i++)
 		{
 			string deli = 
 				(i == (int)missingIds.size() - 1) ? "" : ", ";
-			*fout << missingIds[i] << deli;
+			//print only if part is not a wrong-format ID
+			auto itr = find_if(wrongFormats.begin(), wrongFormats.end(),
+				[id = missingIds.at(i)](const auto& format) {
+				return std::to_string(format.first) == id;
+			});
+			if (itr == wrongFormats.end())
+			{
+				if (firstRound)
+				{
+					*fout << "Missing puzzle element(s) with the following IDs: ";
+					firstRound = false;
+				}
+				*fout << missingIds[i] << deli;
+				printEndl = true;
+			}	
 		}
-		*fout << endl;
+		if(printEndl)
+			*fout << endl;
 	}
 
 	if ((int)wrongIds.size() > 0)
