@@ -8,7 +8,6 @@ Part::Part(int id, int left, int top, int right, int bottom)
 	m_iRight = right;
 	m_iBottom = bottom;
 	m_bCorner = false;
-	rotateAngle = 0;
 }
 
 	

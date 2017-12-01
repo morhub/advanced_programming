@@ -11,7 +11,6 @@ enum direction {
 class Part
 {
 	int m_iId, m_iLeft, m_iTop, m_iRight, m_iBottom;
-	int rotateAngle;
 	bool m_bCorner;
 
 public:
@@ -22,10 +21,8 @@ public:
 	int getTop()				{ return m_iTop; }
 	int getRight()				{ return m_iRight; }
 	int getBottom()				{ return m_iBottom; }
-	int getRotation()			{ return rotateAngle; }
 	bool isCorner()				{ return m_bCorner; }
 	void setCorner(bool b)		{ m_bCorner = b; }
-	void setRotation(int angle) { rotateAngle = angle; }
 };
 
 #endif

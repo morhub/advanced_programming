@@ -1,4 +1,4 @@
-C++ = g++
+C++ = g++-5.3.0
 OBJS = main.o Puzzle.o Part.o Table.o
 EXEC = ex1
 
