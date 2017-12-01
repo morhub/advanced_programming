@@ -14,7 +14,7 @@
 using namespace std;
 
 
-class nonRotatePuzzle : Puzzle
+class nonRotatePuzzle : public Puzzle
 {
 	map<pair<int, int>, map<pair<int, int>, list<Part>*>> m_mPartMap;
 
@@ -44,9 +44,9 @@ public:
 	int preProcess();
 
 	bool isValidStraightEdges(int sizei, int sizej);
+	bool cornerCheck(bool &tr, bool &tl, bool &br, bool &bl);
 
-private:
-	int solveRec(size_t i, size_t j, Table& tab);
+//	int solveRec(size_t i, size_t j, Table& tab);
 };
 
 

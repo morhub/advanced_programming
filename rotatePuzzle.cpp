@@ -19,17 +19,20 @@ rotatePuzzle::rotatePuzzle()
 
 rotatePuzzle::~rotatePuzzle()
 {
-}
-
-
-
-void rotatePuzzle::initPartsMap()
-{
 	
 }
 
 bool rotatePuzzle::isValidStraightEdges(int sizei, int sizej)
 {
-
 	return true;
+}
+
+bool rotatePuzzle::cornerCheck(bool &tr, bool &tl, bool &br, bool &bl)
+{
+	return true;
+}
+
+void rotatePuzzle::initPartsMap()
+{
+
 }

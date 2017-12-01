@@ -15,23 +15,20 @@ using namespace std;
 
 class Puzzle
 {
-public:
+protected:
 	vector<Part> *m_vParts;
 	size_t m_iNumOfElements;
 	ofstream* fout;
-	
+
+public:
 	Puzzle();
 	~Puzzle();
 	Puzzle& operator=(const Puzzle&) = delete;
 	Puzzle(const Puzzle&) = delete;
 
 	int getNumOfElements()  { return m_iNumOfElements; }
-
 	void setOutputStream(std::ofstream* f) { fout = f; }
 	std::vector<Part>* getParts() { return m_vParts; }
-	bool cornerCheck(bool &tr, bool &tl, bool &br, bool &bl);
-	virtual bool isValidStraightEdges(int sizei, int sizej)=0;
-
 
 	/*
 	 * Creates an unsolved Puzzle out of input file path
@@ -55,12 +52,12 @@ public:
 	*
 	*returns 0 on success 
 	*/
-	int preProcess();
+	virtual int preProcess();
 
-
-	virtual void initPartsMap()=0;
-
-
+	virtual bool cornerCheck(bool &tr, bool &tl, bool &br, bool &bl) = 0;
+	virtual bool isValidStraightEdges(int sizei, int sizej) = 0;
+	virtual void initPartsMap() = 0;
+	
 private:
 	int solveRec(size_t i, size_t j, Table& tab);
 };

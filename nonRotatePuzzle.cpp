@@ -82,3 +82,165 @@ bool nonRotatePuzzle::isValidStraightEdges(int sizei, int sizej)
 		return false;
 	return true;
 }
+
+
+void nonRotatePuzzle::initPartsMap()
+{
+
+}
+
+
+int nonRotatePuzzle::preProcess()
+{
+	int ret = 0;
+	int topStraight = 0;
+	int bottomStraight = 0;
+	int leftStraight = 0;
+	int rightStraight = 0;
+
+	for (size_t i = 0; i < m_iNumOfElements; i++)
+	{
+		if ((*m_vParts)[i].getLeft() == 0)
+			leftStraight++;
+		if ((*m_vParts)[i].getTop() == 0)
+			topStraight++;
+		if ((*m_vParts)[i].getRight() == 0)
+			rightStraight++;
+		if ((*m_vParts)[i].getBottom() == 0)
+			bottomStraight++;
+	}
+
+	if (!((topStraight == bottomStraight && topStraight != 0) && (leftStraight == rightStraight && leftStraight != 0)))
+	{
+		*fout << "Cannot solve puzzle: wrong number of straight edges" << endl;
+		ret = -1;
+	}
+
+	ret |= Puzzle::preProcess();
+
+	return ret;
+}
+
+bool nonRotatePuzzle::cornerCheck(bool &tr, bool &tl, bool &br, bool &bl)
+{
+	//the easy case - only one element
+	if (m_iNumOfElements == 1) {
+		Part& p = (*m_vParts)[0];
+		tr = p.getTop() == 0 && p.getRight() == 0;
+		tl = p.getTop() == 0 && p.getLeft() == 0;
+		br = p.getBottom() == 0 && p.getRight() == 0;
+		bl = p.getBottom() == 0 && p.getLeft() == 0;
+		return (tr && tl && br && bl);
+	}
+
+	//the regular case - different 4 corner parts
+	for (size_t i = 0; i < m_iNumOfElements; i++)
+	{
+		Part& pi = (*m_vParts)[i];
+		if (pi.getTop() == 0 && pi.getRight() == 0)
+		{
+			pi.setCorner(true);
+			for (size_t j = 0; j < m_iNumOfElements; j++)
+			{
+				Part& pj = (*m_vParts)[j];
+				if (!pj.isCorner() && pj.getTop() == 0 && pj.getLeft() == 0)
+				{
+					pj.setCorner(true);
+					for (size_t k = 0; k < m_iNumOfElements; k++)
+					{
+						Part& pk = (*m_vParts)[k];
+						if (!pk.isCorner() && pk.getBottom() == 0 && pk.getRight() == 0)
+						{
+							pk.setCorner(true);
+							for (size_t m = 0; m < m_iNumOfElements; m++)
+							{
+								Part& pm = (*m_vParts)[m];
+								if (!pm.isCorner() && pm.getBottom() == 0 && pm.getLeft() == 0)
+								{
+									pm.setCorner(true);
+									return true;
+								}
+							}
+							pk.setCorner(false);
+						}
+					}
+					pj.setCorner(false);
+				}
+			}
+			pi.setCorner(false);
+		}
+	}
+
+	//the row case - 2 corner parts
+	for (size_t i = 0; i < m_iNumOfElements; i++)
+	{
+		Part& pi = (*m_vParts)[i];
+
+		//if a single part isn't straight on top/bottom, it will fail
+		if (pi.getTop() != 0 || pi.getBottom() != 0)
+			break;
+
+		if (pi.getRight() == 0)
+		{
+			pi.setCorner(true);
+			for (size_t j = 0; j < m_iNumOfElements; j++)
+			{
+				Part& pj = (*m_vParts)[j];
+				if (!pj.isCorner() && pj.getLeft() == 0)
+				{
+					pj.setCorner(true);
+					return true;
+				}
+			}
+			pi.setCorner(false);
+		}
+	}
+
+	//the col case - 2 corner parts
+	for (size_t i = 0; i < m_iNumOfElements; i++)
+	{
+		Part& pi = (*m_vParts)[i];
+
+		//if a single part isn't straight on right/left, it will fail
+		if (pi.getLeft() != 0 || pi.getRight() != 0)
+			break;
+
+		if (pi.getTop() == 0)
+		{
+			pi.setCorner(true);
+			for (size_t j = 0; j < m_iNumOfElements; j++)
+			{
+				Part& pj = (*m_vParts)[j];
+				if (!pj.isCorner() && pj.getBottom() == 0)
+				{
+					pj.setCorner(true);
+					return true;
+				}
+			}
+			pi.setCorner(false);
+		}
+	}
+
+	// if we got so far, it means there is no available solution (not enough corners)!
+	for (size_t i = 0; i < m_iNumOfElements; i++)
+	{
+		Part& p = (*m_vParts)[i];
+		if (p.getTop() == 0 && p.getRight() == 0) {
+			tr = true;
+			continue;
+		}
+		if (p.getTop() == 0 && p.getLeft() == 0) {
+			tl = true;
+			continue;
+		}
+		if (p.getBottom() == 0 && p.getRight() == 0) {
+			br = true;
+			continue;
+		}
+		if (p.getBottom() == 0 && p.getLeft() == 0) {
+			bl = true;
+			continue;
+		}
+	}
+	return false;
+}
