@@ -194,27 +194,18 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 	if (i == (size_t)tab.getRows() - 1) //last in col (e.g frame part)
 		bottompeek = 0;
 
-	auto& matches = getMatches(leftpeek, toppeek);
+	auto& matches = getMatches(leftpeek, toppeek, rightpeek, bottompeek);
 
 	//We always check the top-left directions - 
 	//solve the puzzle from top-left to bottom-right
-	for (pair<list<Part>*, int>& matchpair : matches)
+	for (auto& match : matches)
 	{
-		list<Part>* matchlist = matchpair.first;
-		int rotation = matchpair.second;
+		list<Part>* matchlist = match.first;
+		int rotation = match.second;
 
 		//no parts of this left-top edges are avilable
 		if (matchlist->empty())
 			continue;
-/* TODO should be done differently in every inheritor		
-		//this is not the apropriate right-edge list of parts 
-		if (rightpeek > -2 && rightpeek != m.first.first)
-			continue;
-
-		//this is not the apropriate bottom-edge list of parts 
-		if (bottompeek > -2 && bottompeek != m.first.second)
-			continue;
-*/
 
 		//if we got so far, we have match in this list - continue checking this part
 		Part current = matchlist->front();

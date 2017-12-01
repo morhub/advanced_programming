@@ -37,9 +37,8 @@ public:
 
 	virtual bool isValidStraightEdges(int sizei, int sizej);
 	virtual bool cornerCheck(bool &tr, bool &tl, bool &br, bool &bl);
-	virtual list<pair<list<Part>*, int>> getMatches(int left, int top);
+	virtual list<pair<list<Part>*, int>> getMatches(int left, int top, int right, int bottom);
 
 private:
-//	int solveRec(size_t i, size_t j, Table& tab);
 };
 #endif

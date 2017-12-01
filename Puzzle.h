@@ -57,7 +57,7 @@ public:
 	virtual bool isValidStraightEdges(int sizei, int sizej) = 0;
 	virtual bool cornerCheck(bool &tr, bool &tl, bool &br, bool &bl) = 0;
 	virtual void initPartsMap() = 0;
-	virtual list<pair<list<Part>*, int>> getMatches(int left, int top) = 0;
+	virtual list<pair<list<Part>*, int>> getMatches(int left, int top, int right, int bottom) = 0;
 
 private:
 	int solveRec(size_t i, size_t j, Table& tab);

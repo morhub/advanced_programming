@@ -239,7 +239,7 @@ bool nonRotatePuzzle::cornerCheck(bool &tr, bool &tl, bool &br, bool &bl)
 	return false;
 }
 
-list<pair<list<Part>*, int>> nonRotatePuzzle::getMatches(int left, int top)
+list<pair<list<Part>*, int>> nonRotatePuzzle::getMatches(int left, int top, int right, int bottom)
 {
 	list<pair<list<Part>*, int>> retlist;
 	const auto& MatchMap = m_mPartMap[make_pair(left, top)];
@@ -253,5 +253,25 @@ list<pair<list<Part>*, int>> nonRotatePuzzle::getMatches(int left, int top)
 						return make_pair(pair.second, 0);
 					 }
 				  );
+
+	if (retlist.empty())
+		return retlist;
+
+	retlist.erase(std::remove_if(retlist.begin(), retlist.end(),
+		[right, bottom](pair<list<Part>*, int> value) {
+			list<Part>* partList = value.first;
+			if (partList->empty())
+				return true;
+
+			auto& p = partList->begin();
+			//if right/bottom doesn't exist, just set them to p.right/p.bottom
+			int _right = (right == -2) ? p->getRight() : right;
+			int _bottom = (bottom == -2) ? p->getBottom() : bottom;
+
+			return (_right != p->getRight() || _bottom != p->getBottom());
+		}),
+		retlist.end()
+	);
+
 	return retlist;
 }
