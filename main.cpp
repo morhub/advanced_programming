@@ -7,7 +7,7 @@
 #include <iostream>
 #include "Puzzle.h"
 #include "Table.h"
-//#include <windows.h>
+
 
 using std::cout;
 using std::endl;
