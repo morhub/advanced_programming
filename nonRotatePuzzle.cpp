@@ -84,12 +84,6 @@ bool nonRotatePuzzle::isValidStraightEdges(int sizei, int sizej)
 }
 
 
-void nonRotatePuzzle::initPartsMap()
-{
-
-}
-
-
 int nonRotatePuzzle::preProcess()
 {
 	int ret = 0;
@@ -243,4 +237,21 @@ bool nonRotatePuzzle::cornerCheck(bool &tr, bool &tl, bool &br, bool &bl)
 		}
 	}
 	return false;
+}
+
+list<pair<list<Part>*, int>> nonRotatePuzzle::getMatches(int left, int top)
+{
+	list<pair<list<Part>*, int>> retlist;
+	const auto& MatchMap = m_mPartMap[make_pair(left, top)];
+
+	/* transform "map<pair<int, int>, list<Part>*>" into "list<pair<list<Part>*, int>>".
+	 * the "0" stands for zero rotation, since no rotation are allowed in this scenario */
+	std::transform(MatchMap.begin(), MatchMap.end(),
+				   std::back_inserter(retlist),
+				   [](const std::map<pair<int, int>, list<Part>*>::value_type &pair)
+					 {
+						return make_pair(pair.second, 0);
+					 }
+				  );
+	return retlist;
 }

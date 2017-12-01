@@ -41,12 +41,12 @@ public:
 	*
 	*returns 0 on success
 	*/
-	int preProcess();
+	virtual int preProcess();
 
-	bool isValidStraightEdges(int sizei, int sizej);
-	bool cornerCheck(bool &tr, bool &tl, bool &br, bool &bl);
-
-//	int solveRec(size_t i, size_t j, Table& tab);
+	virtual bool isValidStraightEdges(int sizei, int sizej);
+	virtual bool cornerCheck(bool &tr, bool &tl, bool &br, bool &bl);
+	virtual void initPartsMap();
+	virtual list<pair<list<Part>*, int>> getMatches(int left, int top);
 };
 
 

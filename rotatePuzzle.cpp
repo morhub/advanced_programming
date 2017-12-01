@@ -36,3 +36,8 @@ void rotatePuzzle::initPartsMap()
 {
 
 }
+
+list<pair<list<Part>*, int>> rotatePuzzle::getMatches(int left, int top)
+{
+	return m_mPartMap[make_pair(left, top)];
+}

@@ -33,10 +33,11 @@ public:
 	*  (the same part after rotation of size "rotate_Angle").
 	*	each of the lists can be pointed to by several pairs of the map.
 	*/
-	void initPartsMap();
+	virtual void initPartsMap();
 
-	bool isValidStraightEdges(int sizei, int sizej);
-	bool cornerCheck(bool &tr, bool &tl, bool &br, bool &bl);
+	virtual bool isValidStraightEdges(int sizei, int sizej);
+	virtual bool cornerCheck(bool &tr, bool &tl, bool &br, bool &bl);
+	virtual list<pair<list<Part>*, int>> getMatches(int left, int top);
 
 private:
 //	int solveRec(size_t i, size_t j, Table& tab);

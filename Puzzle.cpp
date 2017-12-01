@@ -177,9 +177,6 @@ int Puzzle::init(std::string path)
 }
 
 
-
-
-
 int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 {
 	int** table = tab.getTable(); 
@@ -192,21 +189,24 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 		leftpeek = 0-((*m_vParts)[table[i][j - 1] - 1].getRight());
 	if (i > 0 && table[i - 1][j] >= 0)
 		toppeek =  0-((*m_vParts) [table[i-1][j]-1].getBottom());
-	if(j < (size_t)tab.getCols() - 1 && table[i][j + 1] != 0) //not empty
+	if(j == (size_t)tab.getCols() - 1) //last in line (e.g. frame part)
 		rightpeek = 0;
-	if (i < (size_t)tab.getRows() - 1 && table[i+1][j] != 0) //not empty
+	if (i == (size_t)tab.getRows() - 1) //last in col (e.g frame part)
 		bottompeek = 0;
 
-	map<pair<int, int>, list<Part>*> currentMap= m_mPartMap[make_pair(leftpeek, toppeek)];
-	
+	auto& matches = getMatches(leftpeek, toppeek);
+
 	//We always check the top-left directions - 
 	//solve the puzzle from top-left to bottom-right
-	for (auto const &m : currentMap)
+	for (pair<list<Part>*, int>& matchpair : matches)
 	{
+		list<Part>* matchlist = matchpair.first;
+		int rotation = matchpair.second;
+
 		//no parts of this left-top edges are avilable
-		if (m.second->empty())
+		if (matchlist->empty())
 			continue;
-		
+/* TODO should be done differently in every inheritor		
 		//this is not the apropriate right-edge list of parts 
 		if (rightpeek > -2 && rightpeek != m.first.first)
 			continue;
@@ -214,10 +214,12 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 		//this is not the apropriate bottom-edge list of parts 
 		if (bottompeek > -2 && bottompeek != m.first.second)
 			continue;
+*/
 
 		//if we got so far, we have match in this list - continue checking this part
-		Part current = m.second->front();
-		m.second->pop_front();
+		Part current = matchlist->front();
+		matchlist->pop_front();
+		current.addRotation(rotation);
 		table[i][j] = current.getId();
 		
 		//End of table
@@ -232,7 +234,8 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 			else
 			{
 				table[i][j] = 0;
-				m.second->push_back(current);
+				current.addRotation(-rotation);
+				matchlist->push_back(current);
 				continue;
 			}
 		}
@@ -243,7 +246,8 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 			else
 			{
 				table[i][j] = 0;
-				m.second->push_back(current);
+				current.addRotation(-rotation);
+				matchlist->push_back(current);
 				continue;
 			}
 		}

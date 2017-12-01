@@ -26,6 +26,7 @@ public:
 	bool isCorner()				{ return m_bCorner; }
 	void setCorner(bool b)		{ m_bCorner = b; }
 	void setRotation(int angle) { rotateAngle = angle; }
+	void addRotation(int addition) { rotateAngle += addition; }
 };
 
 #endif
