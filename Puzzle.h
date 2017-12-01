@@ -15,12 +15,11 @@ using namespace std;
 
 class Puzzle
 {
+public:
 	vector<Part> *m_vParts;
 	size_t m_iNumOfElements;
 	ofstream* fout;
-	map<pair<int, int>, map<pair<int, int>, list<Part>*>> m_mPartMap;
-
-public:
+	
 	Puzzle();
 	~Puzzle();
 	Puzzle& operator=(const Puzzle&) = delete;
@@ -31,7 +30,7 @@ public:
 	void setOutputStream(std::ofstream* f) { fout = f; }
 	std::vector<Part>* getParts() { return m_vParts; }
 	bool cornerCheck(bool &tr, bool &tl, bool &br, bool &bl);
-	bool isValidStraightEdges(int sizei, int sizej);
+	virtual bool isValidStraightEdges(int sizei, int sizej)=0;
 
 
 	/*
@@ -59,14 +58,7 @@ public:
 	int preProcess();
 
 
-	/*
-	* A data structure which contains:
-	* 1- a map of <left, top> keys, the value is:
-	* 2- a map of <right, bottom> keys, the value is:
-	* 3- list of parts that has the edges of the keys indexes
-	* 
-	*/
-	void initPartsMap();
+	virtual void initPartsMap()=0;
 
 
 private:
