@@ -177,9 +177,6 @@ int Puzzle::init(std::string path)
 }
 
 
-
-
-
 int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 {
 	int** table = tab.getTable(); 
@@ -189,35 +186,38 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 	leftpeek  = toppeek    = 0; //there is a frame part to the left/top
 	
 	if (j > 0 && table[i][j - 1] >= 0)
-		leftpeek = 0-((*m_vParts)[table[i][j - 1] - 1].getRight());
+	{
+		int angle = (*m_vParts)[table[i][j - 1] - 1].getRotation();
+		leftpeek = 0 - ((*m_vParts)[table[i][j - 1] - 1].getRightAfterRotate(angle));
+	}
 	if (i > 0 && table[i - 1][j] >= 0)
-		toppeek =  0-((*m_vParts) [table[i-1][j]-1].getBottom());
-	if(j < (size_t)tab.getCols() - 1 && table[i][j + 1] != 0) //not empty
+	{
+		int angle = (*m_vParts)[table[i - 1][j] - 1].getRotation();
+		toppeek = 0 - ((*m_vParts)[table[i - 1][j] - 1].getBottomAfterRotate(angle));
+	}
+	if(j == (size_t)tab.getCols() - 1)   //last in line (e.g. frame part)
 		rightpeek = 0;
-	if (i < (size_t)tab.getRows() - 1 && table[i+1][j] != 0) //not empty
+	if (i == (size_t)tab.getRows() - 1) //last in col (e.g frame part)
 		bottompeek = 0;
 
-	map<pair<int, int>, list<Part>*> currentMap= m_mPartMap[make_pair(leftpeek, toppeek)];
-	
+	auto& matches = getMatches(leftpeek, toppeek, rightpeek, bottompeek);
+
 	//We always check the top-left directions - 
 	//solve the puzzle from top-left to bottom-right
-	for (auto const &m : currentMap)
+	for (auto& match : matches)
 	{
-		//no parts of this left-top edges are avilable
-		if (m.second->empty())
-			continue;
-		
-		//this is not the apropriate right-edge list of parts 
-		if (rightpeek > -2 && rightpeek != m.first.first)
-			continue;
+		list<Part>* matchlist = match.first;
+		int rotation = match.second;
 
-		//this is not the apropriate bottom-edge list of parts 
-		if (bottompeek > -2 && bottompeek != m.first.second)
+		//no parts of this left-top edges are avilable
+		if (matchlist->empty())
 			continue;
 
 		//if we got so far, we have match in this list - continue checking this part
-		Part current = m.second->front();
-		m.second->pop_front();
+		Part current = matchlist->front();
+		matchlist->pop_front();
+		current.addRotation(rotation);
+		m_vParts->at(current.getId() - 1).addRotation(rotation);
 		table[i][j] = current.getId();
 		
 		//End of table
@@ -232,7 +232,13 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 			else
 			{
 				table[i][j] = 0;
-				m.second->push_back(current);
+				if (current.getRotation() < 0)
+					std::cout << "nooooooo" << endl;
+				current.addRotation(-rotation);
+				if (current.getRotation() < 0)
+					std::cout << "nooooooo" << endl;
+				m_vParts->at(current.getId() - 1).addRotation(-rotation);
+				matchlist->push_back(current);
 				continue;
 			}
 		}
@@ -243,7 +249,13 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 			else
 			{
 				table[i][j] = 0;
-				m.second->push_back(current);
+				if (current.getRotation() < 0)
+					std::cout << "nooooooo" << endl;
+				current.addRotation(-rotation);
+				if (current.getRotation() < 0)
+					std::cout << "nooooooo" << endl;
+				m_vParts->at(current.getId() - 1).addRotation(-rotation);
+				matchlist->push_back(current);
 				continue;
 			}
 		}
@@ -265,7 +277,15 @@ Table Puzzle::Solve()
 			Table table(i, size/i); 
 			ret = solveRec(0, 0, table);
 			if (ret == 0)
+			{
+				//temp code !!!!!!!!!!!!!
+				for (int k = 0; k < getNumOfElements(); k++)
+					cout << "rotation of part " << m_vParts->at(k).getId() << " is " <<
+					m_vParts->at(k).getRotation() << endl;
+				////////////
 				return table;
+
+			}
 		}
 	}
 	

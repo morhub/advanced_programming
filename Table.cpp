@@ -52,6 +52,7 @@ void Table::print(std::ofstream& fout)
 				deli = "\n";
 			else
 				deli = " ";
+			std::cout << m_iTable[i][j] << " " << i << " " << j << " " << deli;
 			fout << m_iTable[i][j] << deli;
 		}
 	}

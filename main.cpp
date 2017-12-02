@@ -6,6 +6,8 @@
 #include <cstring>
 #include <iostream>
 #include "Puzzle.h"
+#include "rotatePuzzle.h"
+#include "nonRotatePuzzle.h"
 #include "Table.h"
 
 
@@ -15,15 +17,46 @@ using std::endl;
 int main(int argc, char *argv[])
 {
 	int rc = 0;
+	char *input_file, *output_file;
+	bool rotate;
+	Puzzle* puz;
+	string Rotate = "-rotate";
 
-	if (argc != 3) {
+	switch (argc) {
+	case 3:
+		input_file = argv[1];
+		output_file = argv[2];
+		rotate = false;
+		break;
+	case 4:
+		if (!Rotate.compare(argv[1])) {
+			input_file = argv[2];
+			output_file = argv[3];
+			rotate = true;
+			break;
+		} else if (!Rotate.compare(argv[2])) {
+			input_file = argv[1];
+			output_file = argv[3];
+			rotate = true;
+			break;
+		} else if (!Rotate.compare(argv[3])) {
+			input_file = argv[1];
+			output_file = argv[2];
+			rotate = true;
+			break;
+		} else
+			/* pass through */ 
+	default:
 		cout << "Usage: " << argv[0] << " <input_file> <output_file>" << endl;
 		return -1;
 	}
 
-	std::ofstream output(argv[2]);
+	std::ofstream output(output_file);
 
-	Puzzle* puz = new Puzzle();
+	if (rotate)
+		puz = new rotatePuzzle();
+	else
+		puz = new nonRotatePuzzle();
 
 	puz->setOutputStream(&output);
 

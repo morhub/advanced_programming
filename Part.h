@@ -1,6 +1,8 @@
 #ifndef PART_H
 #define PART_H
 
+#define MODULO(a,b) (a%b+b)%b
+
 enum direction {
 	LEFT,
 	TOP,
@@ -25,12 +27,16 @@ public:
 	int getRotation()			{ return rotateAngle; }
 	bool isCorner()				{ return m_bCorner; }
 	void setCorner(bool b)		{ m_bCorner = b; }
-	void setRotation(int angle) { rotateAngle = angle; }
+	void setRotation(int angle) { rotateAngle = MODULO(angle, 4); }
+
+	int getRightAfterRotate(int angle);
+	int getBottomAfterRotate(int angle);
 
 	/*
 	 *	is this part is a permotation of part b? 
 	 */
-	bool isPermotation(Part b);
+	int isPermotation(Part b);
+	int isPermotation(int left, int top, int right, int bottom);
 
 	/*
 	 * does this part have a permotation witch suites the 
@@ -39,7 +45,10 @@ public:
 	 *  if there is, return 0-3 according to the rotation angle
 	 * (1 for 90, 2 for 180, 3 for 360)
 	 */
-	int Part::matchTopLeft(int top, int left);
+	int Part::matchLeftTop(int left, int top);
+	
+	
+	void addRotation(int addition) { rotateAngle = MODULO(rotateAngle + addition, 4); }
 
 };
 
