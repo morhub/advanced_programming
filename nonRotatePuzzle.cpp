@@ -53,7 +53,8 @@ void nonRotatePuzzle::initPartsMap()
 	int l, t, r, b;
 	for (size_t i = 0; i < m_iNumOfElements; i++)
 	{
-		Part& p = m_vParts->at(i);
+		Part& p = 
+			Parts->at(i);
 		l = p.getLeft();
 		t = p.getTop();
 		r = p.getRight();
