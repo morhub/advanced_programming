@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 
 	Table table = puz->Solve();
 	if (table.getTable())
-		table.print(output);
+		table.print(output, puz);
 	else
 		rc = -1;
 	

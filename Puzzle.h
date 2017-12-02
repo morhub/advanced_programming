@@ -9,9 +9,11 @@
 #include <iostream>
 #include <vector>
 #include <map>
-#include<list>
+#include <list>
+
 using namespace std;
 
+class Table;
 
 class Puzzle
 {
@@ -62,4 +64,6 @@ public:
 private:
 	int solveRec(size_t i, size_t j, Table& tab);
 };
+
+
 #endif

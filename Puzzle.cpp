@@ -265,6 +265,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 
 Table Puzzle::Solve()
 {
+	cout << "pre-proc ended" << endl;
 	unsigned int i;
 	int ret;
 	unsigned int size = m_iNumOfElements;
@@ -278,11 +279,11 @@ Table Puzzle::Solve()
 			ret = solveRec(0, 0, table);
 			if (ret == 0)
 			{
-				//temp code !!!!!!!!!!!!!
-				for (int k = 0; k < getNumOfElements(); k++)
-					cout << "rotation of part " << m_vParts->at(k).getId() << " is " <<
-					m_vParts->at(k).getRotation() << endl;
-				////////////
+				////temp code !!!!!!!!!!!!!
+				//for (int k = 0; k < getNumOfElements(); k++)
+				//	cout << "rotation of part " << m_vParts->at(k).getId() << " is " <<
+				//	m_vParts->at(k).getRotation() << endl;
+				//////////////
 				return table;
 
 			}

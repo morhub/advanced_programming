@@ -4,6 +4,8 @@
 
 using std::string;
 using std::endl;
+using namespace std;
+
 
 Table::Table(unsigned int rows, unsigned int cols):
 	m_iRows(rows),
@@ -41,19 +43,22 @@ Table::Table(const Table& table):
 }
 
 
-void Table::print(std::ofstream& fout)
+void Table::print(std::ofstream& fout, Puzzle* puz)
 {
 	unsigned int i, j;
 	string deli;
-
 	for (i = 0; i < m_iRows; i++) {
 		for (j = 0; j < m_iCols; j++) {
 			if (j == m_iCols - 1)
 				deli = "\n";
 			else
 				deli = " ";
-			std::cout << m_iTable[i][j] << " " << i << " " << j << " " << deli;
-			fout << m_iTable[i][j] << deli;
+			int r = puz->getParts()->at(m_iTable[i][j] - 1).getRotation();
+			if(r != 0 )
+				fout << m_iTable[i][j] << " [" << r*90 << "] " << deli;
+			//std::cout << m_itable[i][j] << puzzle::getparts()->at(i)->getleft() << deli;
+			else
+				fout << m_iTable[i][j] << deli;
 		}
 	}
 }

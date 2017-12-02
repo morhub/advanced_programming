@@ -1,7 +1,11 @@
 #ifndef TABLE_H
 #define TABLE_H
+
 #include <iostream>
 #include <fstream>
+#include "Puzzle.h"
+
+class Puzzle; 
 
 class Table
 {
@@ -19,6 +23,8 @@ public:
 	int getCols() { return m_iCols; }
 	int getSize() { return m_iRows * m_iCols; }
 	int** getTable() {return m_iTable; }
-	void print(std::ofstream&);
+	virtual void print(std::ofstream& fout, Puzzle* puz);
 };
+
+
 #endif
