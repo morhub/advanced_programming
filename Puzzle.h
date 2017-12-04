@@ -19,6 +19,7 @@ class Puzzle
 {
 protected:
 	vector<Part> *m_vParts;
+	map<pair<int, int>, list<pair<list<Part>*, int>>> m_mMatches;
 	size_t m_iNumOfElements;
 	ofstream* fout;
 
@@ -63,6 +64,9 @@ public:
 
 private:
 	int solveRec(size_t i, size_t j, Table& tab);
+
+protected:
+	void preComputeCommonCase();
 };
 
 

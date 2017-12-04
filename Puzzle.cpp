@@ -179,12 +179,13 @@ int Puzzle::init(std::string path)
 
 int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 {
-	int** table = tab.getTable(); 
-	
+	int** table = tab.getTable();
+	list<pair<list<Part>*, int>> matches;
+
 	int leftpeek, toppeek, rightpeek, bottompeek;
 	rightpeek = bottompeek = -2; //there is no part to the right/bottom
 	leftpeek  = toppeek    = 0; //there is a frame part to the left/top
-	
+
 	if (j > 0 && table[i][j - 1] >= 0)
 	{
 		int angle = (*m_vParts)[table[i][j - 1] - 1].getRotation();
@@ -200,7 +201,10 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 	if (i == (size_t)tab.getRows() - 1) //last in col (e.g frame part)
 		bottompeek = 0;
 
-	auto& matches = getMatches(leftpeek, toppeek, rightpeek, bottompeek);
+	if (rightpeek == -2 && bottompeek == -2) //common case in our algorithm
+		matches = m_mMatches[make_pair(leftpeek, toppeek)];
+	else
+		matches = getMatches(leftpeek, toppeek, rightpeek, bottompeek);
 
 	//We always check the top-left directions - 
 	//solve the puzzle from top-left to bottom-right
@@ -269,6 +273,8 @@ Table Puzzle::Solve()
 	unsigned int i;
 	int ret;
 	unsigned int size = m_iNumOfElements;
+	
+	preComputeCommonCase();
 
 	for(i = 1; i <= size; i++) {
 		if (size % i == 0) {
@@ -331,4 +337,12 @@ int Puzzle::preProcess()
 	}
 
 	return ret;
+}
+
+void Puzzle::preComputeCommonCase()
+{
+	//pre-compute the common case (no right,bottom edges)
+	for (int i = -1; i < 2; i++)
+		for (int j = -1; j < 2; j++)
+			m_mMatches[make_pair(i, j)] = getMatches(i, j, -2, -2);
 }
