@@ -221,7 +221,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 			continue;
 
 		//if we got so far, we have match in this list - continue checking this part
-		Part current = matchlist->front();
+		auto& current = matchlist->front();
 		//if (i>1)
 		//	cout << "part:" << current.getId();
 		matchlist->pop_front();
@@ -244,9 +244,9 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 			{
 				table[i][j] = 0;
 				if (current.getRotation() < 0)
-				current.addRotation(-rotation);
-				if (current.getRotation() < 0)
-				m_vParts->at(current.getId() - 1).addRotation(-rotation);
+					current.addRotation(-rotation);
+				//if (current->getRotation() < 0)
+				//	m_vParts->at(current->getId() - 1).addRotation(-rotation);
 				matchlist->push_back(current);
 				continue;
 			}
@@ -258,11 +258,11 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 			else
 			{
 				table[i][j] = 0;
-				if (current.getRotation() < 0)
+				/*if (current->getRotation() < 0)
 					std::cout << "nooooooo" << endl;
-				current.addRotation(-rotation);
-				if (current.getRotation() < 0)
-					std::cout << "nooooooo" << endl;
+				current->addRotation(-rotation);
+				if (current->getRotation() < 0)
+					std::cout << "nooooooo" << endl;*/
 				m_vParts->at(current.getId() - 1).addRotation(-rotation);
 				matchlist->push_back(current);
 				continue;

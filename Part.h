@@ -31,6 +31,7 @@ public:
 
 	int getRightAfterRotate(int angle);
 	int getBottomAfterRotate(int angle);
+	//bool isSpecialPart(Part* p);
 
 	/*
 	 *	is this part is a permotation of part b? 

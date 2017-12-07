@@ -18,7 +18,7 @@ rotatePuzzle::rotatePuzzle()
 	{
 		for (int j = -1; j < 2; j++)
 		{
-			m_mPartMap[make_pair(i, j)] = *(new list<pair<list<Part>*, int>>());	
+			m_mPartMap[make_pair(i, j)] = *(new list<pair<list<Part>*, int>>());
 		}
 	}
 }
@@ -55,7 +55,7 @@ void rotatePuzzle::initPartsMap()
 	list<list<Part>*> templist;
 
 	//first part - new list 
-	templist.emplace_back(new list<Part>{ m_vParts->at(0) });
+	templist.emplace_back(new list<Part>{m_vParts->at(0) });
 
 	for (int i = 1; i < getNumOfElements(); i++)
 	{
@@ -75,7 +75,7 @@ void rotatePuzzle::initPartsMap()
 		}
 		//didnt find a list for this part- create new one 
 		if (!foundAList)
-			templist.emplace_back(new list<Part>{ m_vParts->at(i) });
+			templist.emplace_back(new list<Part>{m_vParts->at(i) });
 	}
 
 	//init the map member : 
@@ -85,7 +85,6 @@ void rotatePuzzle::initPartsMap()
 		{
 			for (auto& partList : templist)
 			{
-				Part temp = partList->front();  //// part&?
 				int rotate = partList->front().matchLeftTop(left, top);
 				if (rotate == -1) //this list doesnt match to these left, top
 					continue;
@@ -107,18 +106,18 @@ list<pair<list<Part>*, int>> rotatePuzzle::getMatches(int left, int top, int rig
 		return retlist;
 
 	retlist.erase(std::remove_if(retlist.begin(), retlist.end(),
-		[left, top, right, bottom](const pair<list<Part>*, int> value) {
+		[left, top, right, bottom](pair<list<Part>*, int> value) {
 			list<Part>* partList = value.first;
-			if (partList->empty())
+			if (sizeof(partList) == 0)
 				return true;
 
-			auto& p = partList->begin();
-			return ((p->isPermotation(left, top, right, bottom))==-1);
+			auto& p = partList->front();
+			return ((p.isPermotation(left, top, right, bottom))==-1);
 		}),
 		retlist.end()
 	);
 
-	retlist.erase(std::remove_if(retlist.begin(), retlist.end(),
+	/*retlist.erase(std::remove_if(retlist.begin(), retlist.end(),
 		[left, top, right, bottom](const pair<list<Part>*, int> value) {
 		list<Part>* partList = value.first;
 		if (partList->empty())
@@ -127,8 +126,6 @@ list<pair<list<Part>*, int>> rotatePuzzle::getMatches(int left, int top, int rig
 		return (sizeof(partList) == 0);
 		}),
 		retlist.end()
-	);
-
-
+	);*/
 	return retlist;
 }

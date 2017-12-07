@@ -116,3 +116,13 @@ int Part::getBottomAfterRotate(int angle)
 }
 
 
+//void isSpecialPart()
+//{
+//	int l = this->getLeft();
+//	int t = p->getTop();
+//	int r = p->getRight();
+//	int b = p->getBottom();
+//
+//	if ((l == t && t == r) || (t == r && r == b) || (r == b && b == l) || (b == l && l == t))
+//		p->setIsSpecial(true);
+//}

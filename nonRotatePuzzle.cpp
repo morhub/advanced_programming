@@ -263,12 +263,12 @@ list<pair<list<Part>*, int>> nonRotatePuzzle::getMatches(int left, int top, int 
 			if (partList->empty())
 				return true;
 
-			auto& p = partList->begin();
+			auto& p = partList->front();
 			//if right/bottom doesn't exist, just set them to p.right/p.bottom
-			int _right = (right == -2) ? p->getRight() : right;
-			int _bottom = (bottom == -2) ? p->getBottom() : bottom;
+			int _right =  (right == -2)  ? p.getRight()  : right;
+			int _bottom = (bottom == -2) ? p.getBottom() : bottom;
 
-			return (_right != p->getRight() || _bottom != p->getBottom());
+			return (_right != p.getRight() || _bottom != p.getBottom());
 		}),
 		retlist.end()
 	);
