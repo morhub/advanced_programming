@@ -97,15 +97,6 @@ void rotatePuzzle::initPartsMap()
 			}
 		}
 	}
-
-	//for(for(left, top)) - for each i,j : 
-	//is the current list has a permotaion with suited left, top ? 
-	//with int Part::matchTopLeft(int top, int left)
-	//return -1 if there is no match, or 0-3 if there is a match and
-	//the shift-level 
-	//if -1 : move to the next list(parts)
-	//else : push-back this list(part) to the list-value of
-	//this top-left-key
 }
 
 
@@ -126,6 +117,18 @@ list<pair<list<Part>*, int>> rotatePuzzle::getMatches(int left, int top, int rig
 		}),
 		retlist.end()
 	);
+
+	retlist.erase(std::remove_if(retlist.begin(), retlist.end(),
+		[left, top, right, bottom](const pair<list<Part>*, int> value) {
+		list<Part>* partList = value.first;
+		if (partList->empty())
+			return true;
+
+		return (sizeof(partList) == 0);
+		}),
+		retlist.end()
+	);
+
 
 	return retlist;
 }

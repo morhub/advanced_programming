@@ -179,6 +179,9 @@ int Puzzle::init(std::string path)
 
 int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 {
+	//if(i>1)
+	//	cout << "i:" << i << ", j:" << j << endl;
+
 	int** table = tab.getTable();
 	list<pair<list<Part>*, int>> matches;
 
@@ -219,9 +222,13 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 
 		//if we got so far, we have match in this list - continue checking this part
 		Part current = matchlist->front();
+		//if (i>1)
+		//	cout << "part:" << current.getId();
 		matchlist->pop_front();
 		current.addRotation(rotation);
 		m_vParts->at(current.getId() - 1).addRotation(rotation);
+	//	if (i>1)
+	//		cout << " angle: " << current.getRotation() << endl; 
 		table[i][j] = current.getId();
 		
 		//End of table
@@ -237,10 +244,8 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 			{
 				table[i][j] = 0;
 				if (current.getRotation() < 0)
-					std::cout << "nooooooo" << endl;
 				current.addRotation(-rotation);
 				if (current.getRotation() < 0)
-					std::cout << "nooooooo" << endl;
 				m_vParts->at(current.getId() - 1).addRotation(-rotation);
 				matchlist->push_back(current);
 				continue;
@@ -282,7 +287,9 @@ Table Puzzle::Solve()
 				continue;
 				
 			Table table(i, size/i); 
-			ret = solveRec(0, 0, table);
+			cout << "size:" << i << " X " << size / i << endl << endl;
+			if(i!=2 && i!=3)
+				ret = solveRec(0, 0, table);
 			if (ret == 0)
 			{
 				////temp code !!!!!!!!!!!!!
