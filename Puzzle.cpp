@@ -226,7 +226,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 		//	cout << "part:" << current.getId();
 		matchlist->pop_front();
 		current.addRotation(rotation);
-		m_vParts->at(current.getId() - 1).addRotation(rotation);
+		//m_vParts->at(current.getId() - 1).addRotation(rotation);
 	//	if (i>1)
 	//		cout << " angle: " << current.getRotation() << endl; 
 		table[i][j] = current.getId();
@@ -243,9 +243,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 			else
 			{
 				table[i][j] = 0;
-				if (current.getRotation() < 0)
-					current.addRotation(-rotation);
-				//if (current->getRotation() < 0)
+				current.addRotation(-rotation);
 				//	m_vParts->at(current->getId() - 1).addRotation(-rotation);
 				matchlist->push_back(current);
 				continue;
@@ -258,12 +256,8 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 			else
 			{
 				table[i][j] = 0;
-				/*if (current->getRotation() < 0)
-					std::cout << "nooooooo" << endl;
-				current->addRotation(-rotation);
-				if (current->getRotation() < 0)
-					std::cout << "nooooooo" << endl;*/
-				m_vParts->at(current.getId() - 1).addRotation(-rotation);
+				current.addRotation(-rotation);
+				//m_vParts->at(current.getId() - 1).addRotation(-rotation);
 				matchlist->push_back(current);
 				continue;
 			}
