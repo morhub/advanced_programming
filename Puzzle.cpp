@@ -222,7 +222,6 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 		shared_ptr<Part> current = matchlist->front();
 		matchlist->pop_front();
 		current->addRotation(rotation);
-		m_vParts->at(current->getId() - 1)->addRotation(rotation);
 		table[i][j] = current->getId();
 		
 		//End of table
@@ -237,7 +236,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 			else
 			{
 				table[i][j] = 0;
-				m_vParts->at(current->getId() - 1)->addRotation(-rotation);
+				current->addRotation(-rotation);
 				matchlist->push_back(current);
 				continue;
 			}
@@ -249,7 +248,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 			else
 			{
 				table[i][j] = 0;
-				m_vParts->at(current->getId() - 1)->addRotation(-rotation);
+				current->addRotation(-rotation);
 				matchlist->push_back(current);
 				continue;
 			}
