@@ -13,18 +13,6 @@ using std::endl;
 using std::pair;
 
 
-
-Puzzle::Puzzle() 
-{
-	m_vParts = NULL;
-}
-
-Puzzle::~Puzzle()
-{
-	if (m_vParts)
-		delete m_vParts;
-}
-
 int Puzzle::init(std::string path)
 {
 	int rc = 0;
@@ -59,7 +47,7 @@ int Puzzle::init(std::string path)
 			*fout << "Invalid NumOfElements" << endl;
 		}
 	}
-	std::vector<shared_ptr<Part>> *Parts = new std::vector<shared_ptr<Part>>(m_iNumOfElements);
+	shared_ptr<vector<shared_ptr<Part>>> Parts = make_shared<vector<shared_ptr<Part>>>(m_iNumOfElements);
 
 	while (input && getline(input, line) && line.length()!=0) {
 		int id, left, up, right, down, eol;

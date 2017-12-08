@@ -18,20 +18,15 @@ class Table;
 class Puzzle
 {
 protected:
-	vector<shared_ptr<Part>> *m_vParts;
+	shared_ptr<vector<shared_ptr<Part>>> m_vParts;
 	map<pair<int, int>, list<pair<list<shared_ptr<Part>>*, list<int>>>> m_mMatches;
 	size_t m_iNumOfElements;
 	ofstream* fout;
 
 public:
-	Puzzle();
-	~Puzzle();
-	Puzzle& operator=(const Puzzle&) = delete;
-	Puzzle(const Puzzle&) = delete;
-
 	int getNumOfElements()  { return m_iNumOfElements; }
 	void setOutputStream(std::ofstream* f) { fout = f; }
-	std::vector<shared_ptr<Part>>* getParts() { return m_vParts; }
+	shared_ptr<Part> getPartAt(int index) { return m_vParts->at(index); }
 
 	/*
 	 * Creates an unsolved Puzzle out of input file path
