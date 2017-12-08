@@ -253,11 +253,11 @@ Table Puzzle::Solve()
 {
 	unsigned int i;
 	int ret;
-	unsigned int size = getMaxPossibleRows();
+	unsigned int size = m_iNumOfElements;
 	
 	preComputeCommonCase();
 
-	for(i = size; i > 0; i--) {
+	for(i = getMaxPossibleRows(); i > 0; i--) {
 		if (size % i == 0) {
 			if (!isValidStraightEdges(i, size / i))
 				continue;
