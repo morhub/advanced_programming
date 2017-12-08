@@ -239,9 +239,9 @@ bool nonRotatePuzzle::cornerCheck(bool &tr, bool &tl, bool &br, bool &bl)
 	return false;
 }
 
-list<pair<list<shared_ptr<Part>>*, int>> nonRotatePuzzle::getMatches(int left, int top, int right, int bottom)
+list<pair<list<shared_ptr<Part>>*, list<int>>> nonRotatePuzzle::getMatches(int left, int top, int right, int bottom)
 {
-	list<pair<list<shared_ptr<Part>>*, int>> retlist;
+	list<pair<list<shared_ptr<Part>>*, list<int>>> retlist;
 	const auto& MatchMap = m_mPartMap[make_pair(left, top)];
 
 	/* transform "map<pair<int, int>, list<Part>*>" into "list<pair<list<Part>*, int>>".
@@ -250,7 +250,7 @@ list<pair<list<shared_ptr<Part>>*, int>> nonRotatePuzzle::getMatches(int left, i
 				   std::back_inserter(retlist),
 				   [](const std::map<pair<int, int>, list<shared_ptr<Part>>*>::value_type pair)
 					 {
-						return make_pair(pair.second, 0);
+		return make_pair(pair.second, list<int>{0});
 					 }
 				  );
 
@@ -258,17 +258,17 @@ list<pair<list<shared_ptr<Part>>*, int>> nonRotatePuzzle::getMatches(int left, i
 		return retlist;
 
 	retlist.erase(std::remove_if(retlist.begin(), retlist.end(),
-		[right, bottom](const pair<list<shared_ptr<Part>>*, int> value) {
+		[right, bottom](const pair<list<shared_ptr<Part>>*, list<int>> value) {
 			list<shared_ptr<Part>>* partList = value.first;
 			if (partList->empty())
 				return true;
 
 			auto& p = partList->front();
 			//if right/bottom doesn't exist, just set them to p.right/p.bottom
-			int _right =  (right == -2)  ? p.getRight()  : right;
-			int _bottom = (bottom == -2) ? p.getBottom() : bottom;
+			int _right =  (right == -2)  ? p->getRight()  : right;
+			int _bottom = (bottom == -2) ? p->getBottom() : bottom;
 
-			return (_right != p.getRight() || _bottom != p.getBottom());
+			return (_right != p->getRight() || _bottom != p->getBottom());
 		}),
 		retlist.end()
 	);

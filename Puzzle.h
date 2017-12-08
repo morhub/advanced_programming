@@ -19,7 +19,7 @@ class Puzzle
 {
 protected:
 	vector<shared_ptr<Part>> *m_vParts;
-	map<pair<int, int>, list<pair<list<shared_ptr<Part>>*, int>>> m_mMatches;
+	map<pair<int, int>, list<pair<list<shared_ptr<Part>>*, list<int>>>> m_mMatches;
 	size_t m_iNumOfElements;
 	ofstream* fout;
 
@@ -60,7 +60,7 @@ public:
 	virtual bool isValidStraightEdges(int sizei, int sizej) = 0;
 	virtual bool cornerCheck(bool &tr, bool &tl, bool &br, bool &bl) = 0;
 	virtual void initPartsMap() = 0;
-	virtual list<pair<list<shared_ptr<Part>>*, int>> getMatches(int left, int top, int right, int bottom) = 0;
+	virtual list<pair<list<shared_ptr<Part>>*, list<int>>> getMatches(int left, int top, int right, int bottom) = 0;
 
 private:
 	int solveRec(size_t i, size_t j, Table& tab);

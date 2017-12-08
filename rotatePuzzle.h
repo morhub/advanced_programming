@@ -17,7 +17,7 @@ using namespace std;
 
 class rotatePuzzle : public Puzzle
 {
-	map<pair<int, int>, list<pair<list<shared_ptr<Part>>*, int>>> m_mPartMap;
+	map<pair<int, int>, list<pair<list<shared_ptr<Part>>*, list<int>>>> m_mPartMap;
 
 public:
 	rotatePuzzle();
@@ -38,7 +38,7 @@ public:
 
 	virtual bool isValidStraightEdges(int sizei, int sizej);
 	virtual bool cornerCheck(bool &tr, bool &tl, bool &br, bool &bl);
-	virtual list<pair<list<shared_ptr<Part>>*, int>> getMatches(int left, int top, int right, int bottom);
+	virtual list<pair<list<shared_ptr<Part>>*, list<int>>> getMatches(int left, int top, int right, int bottom);
 
 private:
 };

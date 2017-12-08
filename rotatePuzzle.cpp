@@ -18,7 +18,7 @@ rotatePuzzle::rotatePuzzle()
 	{
 		for (int j = -1; j < 2; j++)
 		{
-			m_mPartMap[make_pair(i, j)] = *(new list<pair<list<shared_ptr<Part>>*, int>>());	
+			m_mPartMap[make_pair(i, j)] = *(new list<pair<list<shared_ptr<Part>>*, list<int>>>());	
 		}
 	}
 }
@@ -64,10 +64,12 @@ void rotatePuzzle::initPartsMap()
 		for (auto& partList : templist) 
 		{
 			//this is a list<Part>
-			int rotate = m_vParts->at(i)->isPermotation(*partList->front());
-			if (rotate != -1) //there is a permotation
+			list<int> rotate = m_vParts->at(i)->getPermutations(*partList->front());
+			if (!rotate.empty()) //there is a permotation
 			{
-				m_vParts->at(i)->setRotation(rotate);
+				//in that case it's a real part, meaning right&bottom != -2.
+				// and so its not a special case=> there is only 1 rotation angle
+				m_vParts->at(i)->setRotation(rotate.front());
 				partList->emplace_back(m_vParts->at(i));
 				foundAList = true;
 				break; //move to the next part
@@ -85,12 +87,12 @@ void rotatePuzzle::initPartsMap()
 		{
 			for (auto& partList : templist)
 			{
-				int rotate = partList->front().matchLeftTop(left, top);
-				if (rotate == -1) //this list doesnt match to these left, top
+				list<int> rotates = partList->front()->getPermutations(left, top, -2, -2);
+				if (rotates.empty()) //this list doesnt match to these left, top
 					continue;
 				else
 				{	//map that list&rotation to these left, top
-					auto pr = make_pair(partList, rotate);
+					auto pr = make_pair(partList, rotates);
 					m_mPartMap[make_pair(left, top)].emplace_back(pr);
 				}
 			}
@@ -99,33 +101,22 @@ void rotatePuzzle::initPartsMap()
 }
 
 
-list<pair<list<shared_ptr<Part>>*, int>> rotatePuzzle::getMatches(int left, int top, int right, int bottom)
+list<pair<list<shared_ptr<Part>>*, list<int>>> rotatePuzzle::getMatches(int left, int top, int right, int bottom)
 {
-	list<pair<list<shared_ptr<Part>>*, int>> retlist = m_mPartMap[make_pair(left, top)];
+	list<pair<list<shared_ptr<Part>>*, list<int>>> retlist = m_mPartMap[make_pair(left, top)];
 	if (retlist.empty())
 		return retlist;
 
 	retlist.erase(std::remove_if(retlist.begin(), retlist.end(),
-		[left, top, right, bottom](pair<list<Part>*, int> value) {
-			list<Part>* partList = value.first;
-			if (sizeof(partList) == 0)
-				return true;
-
-			auto& p = partList->front();
-			return ((p.isPermotation(left, top, right, bottom))==-1);
-		}),
-		retlist.end()
-	);
-
-	/*retlist.erase(std::remove_if(retlist.begin(), retlist.end(),
-		[left, top, right, bottom](const pair<list<Part>*, int> value) {
-		list<Part>* partList = value.first;
+		[left, top, right, bottom](pair<list<shared_ptr<Part>>*, list<int>> value) {
+		list<shared_ptr<Part>>* partList = value.first;
 		if (partList->empty())
 			return true;
 
-		return (sizeof(partList) == 0);
-		}),
+		auto& p = partList->front();
+		return ((p->getPermutations(left, top, right, bottom)).empty());
+	}),
 		retlist.end()
-	);*/
+		);
 	return retlist;
 }

@@ -180,11 +180,8 @@ int Puzzle::init(std::string path)
 
 int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 {
-	//if(i>1)
-	//	cout << "i:" << i << ", j:" << j << endl;
-
 	int** table = tab.getTable();
-	list<pair<list<shared_ptr<Part>>*, int>> matches;
+	list<pair<list<shared_ptr<Part>>*, list<int>>> matches;
 
 	int leftpeek, toppeek, rightpeek, bottompeek;
 	rightpeek = bottompeek = -2; //there is no part to the right/bottom
@@ -215,7 +212,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 	for (auto& match : matches)
 	{
 		list<shared_ptr<Part>>* matchlist = match.first;
-		int rotation = match.second;
+		list<int> rotations = match.second;
 
 		//no parts of this left-top edges are avilable
 		if (matchlist->empty())
@@ -224,38 +221,42 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 		//if we got so far, we have match in this list - continue checking this part
 		shared_ptr<Part> current = matchlist->front();
 		matchlist->pop_front();
-		current->addRotation(rotation);
 		table[i][j] = current->getId();
-		
-		//End of table
-		if ((i == (size_t)tab.getRows() - 1) && (j == (size_t)tab.getCols() - 1))
-			return 0; //solve succeeded
+		for (auto& rotation : rotations)
+		{
+			current->addRotation(rotation);
+			//End of table
+			if ((i == (size_t)tab.getRows() - 1) && (j == (size_t)tab.getCols() - 1))
+				return 0; //solve succeeded
 
-		//End of line
-		if (j == (size_t)tab.getCols() - 1)
-		{
-			if (solveRec(i + 1, 0, tab) == 0) //move to the next line, and first column
-				return 0;
-			else
+			//End of line
+			if (j == (size_t)tab.getCols() - 1)
 			{
-				table[i][j] = 0;
-				current->addRotation(-rotation);
-				matchlist->push_back(current);
-				continue;
+				if (solveRec(i + 1, 0, tab) == 0) //move to the next line, and first column
+					return 0;
+				else
+				{
+					//table[i][j] = 0;
+					current->addRotation(-rotation);
+					//matchlist->push_back(current);
+					continue;
+				}
+			}
+			else // "middle" cell in line
+			{
+				if (solveRec(i, j + 1, tab) == 0) //continue solving along the current line
+					return 0;
+				else
+				{
+					//table[i][j] = 0;
+					current->addRotation(-rotation);
+					//matchlist->push_back(current);
+					continue;
+				}
 			}
 		}
-		else // "middle" cell in line
-		{
-			if (solveRec(i, j + 1, tab) == 0) //continue solving along the current line
-				return 0;
-			else
-			{
-				table[i][j] = 0;
-				current->addRotation(-rotation);
-				matchlist->push_back(current);
-				continue;
-			}
-		}
+		table[i][j] = 0;
+		matchlist->push_back(current);
 	}
 	return -1;
 }
@@ -275,7 +276,7 @@ Table Puzzle::Solve()
 				
 			Table table(i, size/i); 
 			cout << "size:" << i << " X " << size / i << endl << endl;
-			if(i!=2 && i!=3)
+		//	if(i!=2 && i!=3) //!!!!!!!!!!!!!!delete
 				ret = solveRec(0, 0, table);
 			if (ret == 0)
 			{

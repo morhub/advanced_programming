@@ -45,7 +45,7 @@ public:
 
 	virtual bool isValidStraightEdges(int sizei, int sizej);
 	virtual bool cornerCheck(bool &tr, bool &tl, bool &br, bool &bl);
-	virtual list<pair<list<shared_ptr<Part>>*, int>> getMatches(int left, int top, int right, int bottom);
+	virtual list<pair<list<shared_ptr<Part>>*, list<int>>> getMatches(int left, int top, int right, int bottom);
 };
 
 

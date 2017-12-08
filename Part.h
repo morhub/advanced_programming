@@ -1,6 +1,13 @@
 #ifndef PART_H
 #define PART_H
 
+#include <iostream>
+#include <vector>
+#include <list>
+
+using namespace std;
+
+
 #define MODULO(a,b) (a%b+b)%b
 
 enum direction {
@@ -31,13 +38,15 @@ public:
 
 	int getRightAfterRotate(int angle);
 	int getBottomAfterRotate(int angle);
-	//bool isSpecialPart(Part* p);
+	bool isSpecial();
+
+	
 
 	/*
 	 *	is this part is a permotation of part b? 
 	 */
-	int isPermotation(Part b);
-	int isPermotation(int left, int top, int right, int bottom);
+	list<int> getPermutations(Part& b);
+	list<int> getPermutations(int left, int top, int right, int bottom);
 
 	/*
 	 * does this part have a permotation witch suites the 
@@ -46,7 +55,7 @@ public:
 	 *  if there is, return 0-3 according to the rotation angle
 	 * (1 for 90, 2 for 180, 3 for 360)
 	 */
-	int Part::matchLeftTop(int left, int top);
+	//list<int> matchLeftTop(int left, int top);
 	
 	
 	void addRotation(int addition) { rotateAngle = MODULO(rotateAngle + addition, 4); }
