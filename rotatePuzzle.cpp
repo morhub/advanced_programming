@@ -18,20 +18,20 @@ rotatePuzzle::rotatePuzzle()
 	{
 		for (int j = -1; j < 2; j++)
 		{
-			m_mPartMap[make_pair(i, j)] = *(new list<pair<list<Part>*, int>>());
+			m_mPartMap[make_pair(i, j)] = *(new list<pair<list<shared_ptr<Part>>*, int>>());	
 		}
 	}
 }
 
 rotatePuzzle::~rotatePuzzle()
 {
-	/*for (int i = -1; i < 2; i++)
+	for (int i = -1; i < 2; i++)
 	{
 		for (int j = -1; j < 2; j++)
 		{
-			delete m_mPartMap[make_pair(i, j)];
+			delete &m_mPartMap[make_pair(i, j)];
 		}
-	}*/
+	}
 }
 
 
@@ -52,10 +52,10 @@ void rotatePuzzle::initPartsMap()
 	bool foundAList = false;
 
 	//from m_vParts to list(list(part))
-	list<list<Part>*> templist;
+	list<list<shared_ptr<Part>>*> templist;
 
 	//first part - new list 
-	templist.emplace_back(new list<Part>{m_vParts->at(0) });
+	templist.emplace_back(new list<shared_ptr<Part>>{ m_vParts->at(0) });
 
 	for (int i = 1; i < getNumOfElements(); i++)
 	{
@@ -64,10 +64,10 @@ void rotatePuzzle::initPartsMap()
 		for (auto& partList : templist) 
 		{
 			//this is a list<Part>
-			int rotate = m_vParts->at(i).isPermotation(partList->front());
+			int rotate = m_vParts->at(i)->isPermotation(*partList->front());
 			if (rotate != -1) //there is a permotation
 			{
-				m_vParts->at(i).setRotation(rotate);
+				m_vParts->at(i)->setRotation(rotate);
 				partList->emplace_back(m_vParts->at(i));
 				foundAList = true;
 				break; //move to the next part
@@ -75,7 +75,7 @@ void rotatePuzzle::initPartsMap()
 		}
 		//didnt find a list for this part- create new one 
 		if (!foundAList)
-			templist.emplace_back(new list<Part>{m_vParts->at(i) });
+			templist.emplace_back(new list<shared_ptr<Part>>{ m_vParts->at(i) });
 	}
 
 	//init the map member : 
@@ -99,9 +99,9 @@ void rotatePuzzle::initPartsMap()
 }
 
 
-list<pair<list<Part>*, int>> rotatePuzzle::getMatches(int left, int top, int right, int bottom)
+list<pair<list<shared_ptr<Part>>*, int>> rotatePuzzle::getMatches(int left, int top, int right, int bottom)
 {
-	list<pair<list<Part>*, int>> retlist = m_mPartMap[make_pair(left, top)];
+	list<pair<list<shared_ptr<Part>>*, int>> retlist = m_mPartMap[make_pair(left, top)];
 	if (retlist.empty())
 		return retlist;
 

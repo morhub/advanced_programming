@@ -53,7 +53,7 @@ void Table::print(std::ofstream& fout, Puzzle* puz)
 				deli = "\n";
 			else
 				deli = " ";
-			int r = puz->getParts()->at(m_iTable[i][j] - 1).getRotation();
+			int r = puz->getParts()->at(m_iTable[i][j] - 1)->getRotation();
 			if(r != 0 )
 				fout << m_iTable[i][j] << " [" << r*90 << "] " << deli;
 			//std::cout << m_itable[i][j] << puzzle::getparts()->at(i)->getleft() << deli;

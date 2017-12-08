@@ -9,6 +9,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <memory>
 #include <list>
 using namespace std;
 
@@ -17,8 +18,8 @@ class Table;
 class Puzzle
 {
 protected:
-	vector<Part> *m_vParts;
-	map<pair<int, int>, list<pair<list<Part>*, int>>> m_mMatches;
+	vector<shared_ptr<Part>> *m_vParts;
+	map<pair<int, int>, list<pair<list<shared_ptr<Part>>*, int>>> m_mMatches;
 	size_t m_iNumOfElements;
 	ofstream* fout;
 
@@ -30,7 +31,7 @@ public:
 
 	int getNumOfElements()  { return m_iNumOfElements; }
 	void setOutputStream(std::ofstream* f) { fout = f; }
-	std::vector<Part>* getParts() { return m_vParts; }
+	std::vector<shared_ptr<Part>>* getParts() { return m_vParts; }
 
 	/*
 	 * Creates an unsolved Puzzle out of input file path
@@ -59,7 +60,7 @@ public:
 	virtual bool isValidStraightEdges(int sizei, int sizej) = 0;
 	virtual bool cornerCheck(bool &tr, bool &tl, bool &br, bool &bl) = 0;
 	virtual void initPartsMap() = 0;
-	virtual list<pair<list<Part>*, int>> getMatches(int left, int top, int right, int bottom) = 0;
+	virtual list<pair<list<shared_ptr<Part>>*, int>> getMatches(int left, int top, int right, int bottom) = 0;
 
 private:
 	int solveRec(size_t i, size_t j, Table& tab);
