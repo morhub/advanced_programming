@@ -236,11 +236,6 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 			else
 			{
 				table[i][j] = 0;
-				if (current.getRotation() < 0)
-					std::cout << "nooooooo" << endl;
-				current.addRotation(-rotation);
-				if (current.getRotation() < 0)
-					std::cout << "nooooooo" << endl;
 				m_vParts->at(current.getId() - 1).addRotation(-rotation);
 				matchlist->push_back(current);
 				continue;
@@ -253,11 +248,6 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 			else
 			{
 				table[i][j] = 0;
-				if (current.getRotation() < 0)
-					std::cout << "nooooooo" << endl;
-				current.addRotation(-rotation);
-				if (current.getRotation() < 0)
-					std::cout << "nooooooo" << endl;
 				m_vParts->at(current.getId() - 1).addRotation(-rotation);
 				matchlist->push_back(current);
 				continue;
@@ -269,7 +259,6 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 
 Table Puzzle::Solve()
 {
-	cout << "pre-proc ended" << endl;
 	unsigned int i;
 	int ret;
 	unsigned int size = m_iNumOfElements;
@@ -285,13 +274,7 @@ Table Puzzle::Solve()
 			ret = solveRec(0, 0, table);
 			if (ret == 0)
 			{
-				////temp code !!!!!!!!!!!!!
-				//for (int k = 0; k < getNumOfElements(); k++)
-				//	cout << "rotation of part " << m_vParts->at(k).getId() << " is " <<
-				//	m_vParts->at(k).getRotation() << endl;
-				//////////////
 				return table;
-
 			}
 		}
 	}
