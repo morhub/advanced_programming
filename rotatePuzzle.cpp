@@ -25,13 +25,13 @@ rotatePuzzle::rotatePuzzle()
 
 rotatePuzzle::~rotatePuzzle()
 {
-	/*for (int i = -1; i < 2; i++)
+	for (int i = -1; i < 2; i++)
 	{
 		for (int j = -1; j < 2; j++)
 		{
-			delete m_mPartMap[make_pair(i, j)];
+			delete &m_mPartMap[make_pair(i, j)];
 		}
-	}*/
+	}
 }
 
 
