@@ -25,6 +25,7 @@ protected:
 
 public:
 	int getNumOfElements()  { return m_iNumOfElements; }
+	virtual int getMaxPossibleRows() { return m_iNumOfElements; }
 	void setOutputStream(std::ofstream* f) { fout = f; }
 	shared_ptr<Part> getPartAt(int index) { return m_vParts->at(index); }
 

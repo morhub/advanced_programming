@@ -10,7 +10,8 @@
 #include <iostream>
 #include <vector>
 #include <map>
-#include<list>
+#include <list>
+#include <cmath>
 
 using namespace std;
 
@@ -35,7 +36,7 @@ public:
 	*	each of the lists can be pointed to by several pairs of the map.
 	*/
 	virtual void initPartsMap();
-
+	virtual int getMaxPossibleRows() { return (int)sqrt(m_iNumOfElements); }
 	virtual bool isValidStraightEdges(int sizei, int sizej);
 	virtual bool cornerCheck(bool &tr, bool &tl, bool &br, bool &bl);
 	virtual list<pair<list<shared_ptr<Part>>*, list<int>>> getMatches(int left, int top, int right, int bottom);
