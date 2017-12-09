@@ -107,16 +107,26 @@ list<pair<list<shared_ptr<Part>>*, list<int>>> rotatePuzzle::getMatches(int left
 	if (retlist.empty())
 		return retlist;
 
+	for(auto& element : retlist)
+	{
+		
+		if (element.first->empty())
+			continue;
+		element.second = element.first->front()->getPermutations(left, top, right, bottom);
+	}
+	
+
 	retlist.erase(std::remove_if(retlist.begin(), retlist.end(),
 		[left, top, right, bottom](pair<list<shared_ptr<Part>>*, list<int>> value) {
 		list<shared_ptr<Part>>* partList = value.first;
 		if (partList->empty())
 			return true;
 
-		auto& p = partList->front();
-		return ((p->getPermutations(left, top, right, bottom)).empty());
+		return (value.second.empty());
 	}),
 		retlist.end()
 		);
+
+
 	return retlist;
 }

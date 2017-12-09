@@ -252,7 +252,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 Table Puzzle::Solve()
 {
 	unsigned int i;
-	int ret;
+	int ret=-1;
 	unsigned int size = m_iNumOfElements;
 	
 	preComputeCommonCase();
@@ -264,7 +264,7 @@ Table Puzzle::Solve()
 				
 			Table table(i, size/i); 
 			cout << "size:" << i << " X " << size / i << endl << endl;
-		//	if(i!=2 && i!=3) //!!!!!!!!!!!!!!delete
+			if(i==9)
 				ret = solveRec(0, 0, table);
 			if (ret == 0)
 			{

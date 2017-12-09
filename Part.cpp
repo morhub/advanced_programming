@@ -26,6 +26,13 @@ list<int> Part::getPermutations(Part& b)
 	p.at(2) = m_iRight;
 	p.at(3) = m_iBottom;
 
+	for (int j = 0; j < rotateAngle; j++)
+	{
+		rotate(p.begin(),
+			p.end() - 1, // this will be the new first element
+			p.end());
+	}
+
 	for (i = 0; i < 4; i++)
 	{
 		if ((b.getLeft()   == -2 || p.at(0) == b.getLeft())   &&

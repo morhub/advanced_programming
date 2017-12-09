@@ -77,6 +77,7 @@ bool nonRotatePuzzle::isValidStraightEdges(int sizei, int sizej)
 			leftStraight++;
 		if (top == 0)
 			topStraight++;
+
 	}
 	if (leftStraight < sizei || topStraight < sizej)
 		return false;
