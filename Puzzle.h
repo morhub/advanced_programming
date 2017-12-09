@@ -60,6 +60,7 @@ public:
 
 private:
 	int solveRec(size_t i, size_t j, Table& tab);
+	vector<int> Puzzle::getMostProbableSizes();
 
 protected:
 	void preComputeCommonCase();

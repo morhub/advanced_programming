@@ -1,6 +1,7 @@
 #include <fstream>
 #include <string>
 #include <cstring>
+#include <cstdlib>
 #include <iostream>
 #include <assert.h> 
 #include "Puzzle.h"
@@ -249,28 +250,55 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 	return -1;
 }
 
+/* Assuming that all "middle" parts are equaly distributed with 1,0,-1 edges,
+ * the difference between number of straight left and top edges comes from the
+ * frame difference. Thus, we can check the actual difference, and sort all 
+ * possible row choosing by their closeness to the actual difference measured.
+ */
+vector<int> Puzzle::getMostProbableSizes()
+{
+	vector<int> sizes;
+	int leftStraight = 0;
+	int topStraight = 0;
+
+	for (size_t i = 1; i < m_iNumOfElements; i++)
+	{
+		if (m_iNumOfElements % i == 0 && isValidStraightEdges(i, m_iNumOfElements / i))
+			sizes.push_back(i);
+
+		int left = (*m_vParts)[i]->getLeft();
+		int top = (*m_vParts)[i]->getTop();
+
+		if (left == 0)
+			leftStraight++;
+		if (top == 0)
+			topStraight++;
+	}
+
+	printf("diff: %d\n", leftStraight - topStraight);
+	std::sort(sizes.begin(), sizes.end(), 
+		[size = m_iNumOfElements, diff = leftStraight - topStraight]
+		(const int a, const int b) -> bool
+		{
+			int diffa = a - size / a;
+			int diffb = b - size / b;
+			return (abs(diffa - diff) < abs(diffb - diff));
+		}
+	);
+
+	return sizes;
+}
+
 Table Puzzle::Solve()
 {
-	unsigned int i;
-	int ret=-1;
-	unsigned int size = m_iNumOfElements;
-	
 	preComputeCommonCase();
 
-	for(i = getMaxPossibleRows(); i > 0; i--) {
-		if (size % i == 0) {
-			if (!isValidStraightEdges(i, size / i))
-				continue;
-				
-			Table table(i, size/i); 
-			cout << "size:" << i << " X " << size / i << endl << endl;
-			if(i==9)
-				ret = solveRec(0, 0, table);
-			if (ret == 0)
-			{
-				return table;
-			}
-		}
+	vector<int> possibleRows = getMostProbableSizes();
+	for(const auto& i : possibleRows) {
+		Table table(i, m_iNumOfElements/i); 
+		printf("size: %d X %d", i, m_iNumOfElements / i);
+		if (solveRec(0, 0, table) == 0)
+			return table;
 	}
 	
 	*fout << "Cannot solve puzzle : it seems that there is no proper solution" << endl;
