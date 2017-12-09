@@ -225,9 +225,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 					return 0;
 				else
 				{
-					//table[i][j] = 0;
 					current->addRotation(-rotation);
-					//matchlist->push_back(current);
 					continue;
 				}
 			}
@@ -237,9 +235,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 					return 0;
 				else
 				{
-					//table[i][j] = 0;
 					current->addRotation(-rotation);
-					//matchlist->push_back(current);
 					continue;
 				}
 			}
@@ -276,7 +272,6 @@ vector<int> Puzzle::getMostProbableSizes()
 			topStraight++;
 	}
 
-	printf("diff: %d\n", leftStraight - topStraight);
 	std::sort(sizes.begin(), sizes.end(), 
 		[size = m_iNumOfElements, diff = leftStraight - topStraight]
 		(const int a, const int b) -> bool
@@ -297,7 +292,6 @@ Table Puzzle::Solve()
 	vector<int> possibleRows = getMostProbableSizes();
 	for(const auto& i : possibleRows) {
 		Table table(i, m_iNumOfElements/i); 
-		printf("size: %d X %d", i, m_iNumOfElements / i);
 		if (solveRec(0, 0, table) == 0)
 			return table;
 	}
