@@ -260,14 +260,15 @@ vector<int> Puzzle::getMostProbableSizes()
 	vector<int> sizes;
 	int leftStraight = 0;
 	int topStraight = 0;
+	int maxPossibleRows = getMaxPossibleRows();
 
-	for (size_t i = 1; i < m_iNumOfElements; i++)
+	for (int i = 1; i <= maxPossibleRows; i++)
 	{
 		if (m_iNumOfElements % i == 0 && isValidStraightEdges(i, m_iNumOfElements / i))
 			sizes.push_back(i);
 
-		int left = (*m_vParts)[i]->getLeft();
-		int top = (*m_vParts)[i]->getTop();
+		int left = (*m_vParts)[i-1]->getLeft();
+		int top = (*m_vParts)[i-1]->getTop();
 
 		if (left == 0)
 			leftStraight++;
