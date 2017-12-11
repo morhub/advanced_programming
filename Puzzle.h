@@ -82,7 +82,7 @@ private:
 	 * Thus, it will be best to order all possible row sizes based on their probability
 	 * to give a physible solution (with respect to topStraight,leftStraight diff).
 	 */
-	vector<int> Puzzle::getMostProbableRowSizes();
+	vector<int> getMostProbableRowSizes();
 
 protected:
 	void preComputeCommonCase();

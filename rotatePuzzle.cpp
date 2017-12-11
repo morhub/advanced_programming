@@ -37,12 +37,24 @@ rotatePuzzle::~rotatePuzzle()
 
 bool rotatePuzzle::isValidStraightEdges(int sizei, int sizej)
 {
-	return true;
+	int straight = 0;
+	for (int i = 0; i < getNumOfElements(); i++) {
+		int left = (*m_vParts)[i]->getLeft();
+		int top = (*m_vParts)[i]->getTop();
+		int bottom = (*m_vParts)[i]->getBottom();
+		int right = (*m_vParts)[i]->getRight();
+
+
+		straight += ((left == 0) + (top == 0) +
+					(right == 0) + (bottom == 0));
+	}
+	return (straight > sizei + sizej);
 }
 
 
 bool rotatePuzzle::cornerCheck(bool &tr, bool &tl, bool &br, bool &bl)
 {
+	tr = tl = br = bl = true;
 	return true;
 }
 
