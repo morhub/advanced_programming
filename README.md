@@ -3,6 +3,20 @@ This repository contains the programming assignments for Advanced Programming co
 
 Maintainers: Nitzan Carmi, Mor Huberman
 
+HW2:
+====
+Changes from HW1:
+1. Introfuce rotation mode - the parts can be rearranged and rotated during solving process.
+   It is being enabled using -rotate command line args.
+
+2. Performance Issues:
+	- Make recursive call to do minimal work: avoid calling "complex" functions on every recursive call.
+	  This caused the creation of new data structure that support online returning of all possible matches in O(1) time
+	  (moving computations to offline stage).
+	- Better use of parts statistics: Based on parts straight edges distribution, choose the most
+	  probable rowsXcols options to be checked first.
+
+
 HW1:
 ===
 This program solves small puzzles, as mentioned below:
