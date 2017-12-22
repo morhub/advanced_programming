@@ -60,15 +60,8 @@ void nonRotatePuzzle::initPartsMap()
 
 		m_mPartMap[make_pair(l, t)][make_pair(r, b)]->push_back(p);
 
-		if (l == 0)
-			leftFrame.addPart(p);
-		if (t == 0)
-			topFrame.addPart(p);
-		if (r == 0)
-			rightFrame.addPart(p);
-		if (b == 0)
-			bottomFrame.addPart(p);
-
+		m_Frame.addPart(p);
+		
 	}
 }
 
@@ -293,16 +286,16 @@ list<shared_ptr<Part>> nonRotatePuzzle::getFrameMatches(int left, int top, int r
 	switch(e)
 	{
 	case LEFT_EDGE:
-		retlist = leftFrame.getParts(bottom);
+		retlist = m_Frame.getParts(bottom, e);
 		break;
 	case TOP_EDGE:
-		retlist = topFrame.getParts(left);
+		retlist = m_Frame.getParts(left,e);
 		break;
 	case BOTTOM_EDGE:
-		retlist = bottomFrame.getParts(right);
+		retlist = m_Frame.getParts(right, e);
 		break;
 	case RIGHT_EDGE:
-		retlist = rightFrame.getParts(top);
+		retlist = m_Frame.getParts(top, e);
 		break;
 	}
 	

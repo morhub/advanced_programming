@@ -23,7 +23,6 @@ public:
 	
 
 	map<pair<int, int>, map<pair<int, int>, list<shared_ptr<Part>>*>> m_mPartMap;
-	frame topFrame, rightFrame, bottomFrame, leftFrame;
 
 
 public:

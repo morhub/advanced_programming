@@ -26,8 +26,28 @@ class Table;
 class Puzzle
 {
 protected:
+	class frame {
+	public:
+		map<int, list<shared_ptr<Part>>> leftEdge;
+		map<int, list<shared_ptr<Part>>> topEdge;
+		map<int, list<shared_ptr<Part>>> rightEdge;
+		map<int, list<shared_ptr<Part>>> bottomEdge;
+
+		//frame(enum edge _e) : e(_e) {}
+
+		void addPart(shared_ptr<Part> p);
+		void removePart(shared_ptr<Part> p);
+
+		list<shared_ptr<Part>> getParts(int peek, enum edge e);
+
+		/*private:
+		getEdgeListFromEdge(enum edge e);*/
+
+	};
+
 	shared_ptr<vector<shared_ptr<Part>>> m_vParts;
 	map<pair<int, int>, list<pair<list<shared_ptr<Part>>*, list<int>>>> m_mMatches;
+	frame m_Frame;
 	size_t m_iNumOfElements;
 	ofstream* fout;
 
@@ -78,26 +98,7 @@ public:
 	virtual void initPartsMap() = 0;
 	virtual list<pair<list<shared_ptr<Part>>*, list<int>>> getMatches(int left, int top, int right, int bottom) = 0;
 
-	class frame {
-	public:
-		enum edge e;
-		list<shared_ptr<Part>> straights;
-		list<shared_ptr<Part>> males;
-		list<shared_ptr<Part>> females;
-
-		frame(enum edge _e) : e(_e) {}
-
-		void addPart(shared_ptr<Part> p);
-		void removePart(shared_ptr<Part> p);
-
-		list<shared_ptr<Part>> getParts(int connection) {
-			if (connection == 0) return straights;
-			else if (connection == 1) return males;
-			else return females;
-		}
-
-
-	};
+	
 
 private:
 	/*

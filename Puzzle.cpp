@@ -318,14 +318,27 @@ int Puzzle::solveFrameRec(size_t i, size_t j, Table& tab)
 
 	getFramePeeks(i, j, leftpeek, toppeek, rightpeek, bottompeek, tab);
 	
-	currentEdge = TOP_EDGE;
+	//currentEdge = TOP_EDGE;
 
 	matches = getFrameMatches(leftpeek, toppeek, rightpeek, bottompeek, currentEdge);
+}
 
-
-
-
-	
+list<shared_ptr<Part>> Puzzle::frame::getParts(int peek, enum edge e) {
+	switch (e)
+	{
+	case TOP_EDGE:
+		return topEdge[peek];
+		break;
+	case RIGHT_EDGE:
+		return rightEdge[peek];
+		break;
+	case LEFT_EDGE:
+		return leftEdge[peek];
+		break;
+	case BOTTOM_EDGE:
+		return bottomEdge[peek];
+		break;
+	}
 }
 
 
@@ -428,66 +441,25 @@ void Puzzle::preComputeCommonCase()
 
 void Puzzle::frame::addPart(shared_ptr<Part> p)
 {
-	int relevantSide;
-	switch (e)
-	{
-	case TOP:
-		relevantSide = p->getLeft();
-		break;
-	case RIGHT:
-		relevantSide = p->getTop();
-		break;
-	case BOTTOM:
-		relevantSide = p->getRight();
-		break;
-	case LEFT:
-		relevantSide = p->getBottom();
-		break;
-	}
-
-	switch (relevantSide)
-	{
-	case -1:
-		females.push_back(p);
-		break;
-	case 0:
-		straights.push_back(p);
-		break;
-	case 1:
-		males.push_back(p);
-		break;
-	}
+	if(p->getTop() == 0)
+		topEdge[p->getLeft()].push_back(p);
+	if(p->getRight() == 0)
+		rightEdge[p->getTop()].push_back(p);
+	if(p->getBottom() == 0)
+		bottomEdge[p->getRight()].push_back(p);
+	if(p->getLeft() == 0)
+		leftEdge[p->getBottom()].push_back(p);
+	
 }
 
 void Puzzle::frame::removePart(shared_ptr<Part> p)
 {
-	int relevantSide;
-	switch (e)
-	{
-	case TOP:
-		relevantSide = p->getLeft();
-		break;
-	case RIGHT:
-		relevantSide = p->getTop();
-		break;
-	case BOTTOM:
-		relevantSide = p->getRight();
-		break;
-	case LEFT:
-		relevantSide = p->getBottom();
-		break;
-	}
-
-	switch (relevantSide)
-	{
-	case -1:
-		females.remove(p);
-		break;
-	case 0:
-		straights.remove(p);
-		break;
-	case 1:
-		males.remove(p);
-		break;
-	}
+	if (p->getTop() == 0)
+		topEdge[p->getLeft()].remove(p);
+	if (p->getRight() == 0)
+		rightEdge[p->getTop()].remove(p);
+	if (p->getBottom() == 0)
+		bottomEdge[p->getRight()].remove(p);
+	if (p->getLeft() == 0)
+		leftEdge[p->getBottom()].remove(p);
 }
