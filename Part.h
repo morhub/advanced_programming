@@ -45,7 +45,7 @@ public:
 	/*
 	 *	is this part is a permotation of part b? 
 	 */
-	list<int> getPermutations(Part& b);
+	list<int> getPermutations(Part b);
 	list<int> getPermutations(int left, int top, int right, int bottom);
 
 	/*

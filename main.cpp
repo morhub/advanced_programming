@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 
 	puz->setOutputStream(&output);
 
-	rc = puz->init(argv[1]);
+	rc = puz->init(input_file);
 	if (rc) {
 		return rc;
 	}

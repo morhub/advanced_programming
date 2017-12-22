@@ -191,6 +191,10 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 	if (i == (size_t)tab.getRows() - 1) //last in col (e.g frame part)
 		bottompeek = 0;
 
+	/*
+	 * We call solveRec a lot of times with the same left, top values,
+	 * So we can use memoization to avoid redundant getMatches() computations
+	 */
 	if (rightpeek == -2 && bottompeek == -2) //common case in our algorithm
 		matches = m_mMatches[make_pair(leftpeek, toppeek)];
 	else
@@ -246,26 +250,21 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 	return -1;
 }
 
-/* Assuming that all "middle" parts are equaly distributed with 1,0,-1 edges,
- * the difference between number of straight left and top edges comes from the
- * frame difference. Thus, we can check the actual difference, and sort all 
- * possible row choosing by their closeness to the actual difference measured.
- */
-vector<int> Puzzle::getMostProbableSizes()
+vector<int> Puzzle::getMostProbableRowSizes()
 {
 	vector<int> sizes;
-	int leftStraight = 0;
-	int topStraight = 0;
 	int maxPossibleRows = getMaxPossibleRows();
-
 	for (int i = 1; i <= maxPossibleRows; i++)
 	{
 		if (m_iNumOfElements % i == 0 && isValidStraightEdges(i, m_iNumOfElements / i))
 			sizes.push_back(i);
+	}
 
-		int left = (*m_vParts)[i-1]->getLeft();
-		int top = (*m_vParts)[i-1]->getTop();
-
+	int leftStraight = 0;
+	int topStraight = 0;
+	for (size_t i = 0; i < m_iNumOfElements; i++){
+		int left = (*m_vParts)[i]->getLeft();
+		int top = (*m_vParts)[i]->getTop();
 		if (left == 0)
 			leftStraight++;
 		if (top == 0)
@@ -289,7 +288,7 @@ Table Puzzle::Solve()
 {
 	preComputeCommonCase();
 
-	vector<int> possibleRows = getMostProbableSizes();
+	vector<int> possibleRows = getMostProbableRowSizes();
 	for(const auto& i : possibleRows) {
 		Table table(i, m_iNumOfElements/i); 
 		if (solveRec(0, 0, table) == 0)

@@ -18,6 +18,11 @@ using namespace std;
 
 class rotatePuzzle : public Puzzle
 {
+	/* 
+	 * A private mapping from a left-top edges pair, to
+	 * a list if possible matches, each one holding its relevant rotation for that match
+	 * That mapping is being computed at initPartsMap
+	 */
 	map<pair<int, int>, list<pair<list<shared_ptr<Part>>*, list<int>>>> m_mPartMap;
 
 public:
@@ -40,7 +45,5 @@ public:
 	virtual bool isValidStraightEdges(int sizei, int sizej);
 	virtual bool cornerCheck(bool &tr, bool &tl, bool &br, bool &bl);
 	virtual list<pair<list<shared_ptr<Part>>*, list<int>>> getMatches(int left, int top, int right, int bottom);
-
-private:
 };
 #endif

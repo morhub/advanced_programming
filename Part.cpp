@@ -1,4 +1,5 @@
 #include "Part.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -15,7 +16,7 @@ Part::Part(int id, int left, int top, int right, int bottom)
 }
 
 
-list<int> Part::getPermutations(Part& b)
+list<int> Part::getPermutations(Part b)
 {
 	list<int> angles;
 	int i;
