@@ -14,9 +14,17 @@
 using namespace std;
 
 
+
+
 class nonRotatePuzzle : public Puzzle
 {
+public:
+
+	
+
 	map<pair<int, int>, map<pair<int, int>, list<shared_ptr<Part>>*>> m_mPartMap;
+	frame topFrame, rightFrame, bottomFrame, leftFrame;
+
 
 public:
 	nonRotatePuzzle();
@@ -46,6 +54,11 @@ public:
 	virtual bool isValidStraightEdges(int sizei, int sizej);
 	virtual bool cornerCheck(bool &tr, bool &tl, bool &br, bool &bl);
 	virtual list<pair<list<shared_ptr<Part>>*, list<int>>> getMatches(int left, int top, int right, int bottom);
+
+	virtual list<shared_ptr<Part>> getFrameMatches(int left, int top, int right, int bottom, enum edge e);
+
+	
+	
 };
 
 

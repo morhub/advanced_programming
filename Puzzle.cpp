@@ -179,12 +179,12 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 	if (j > 0 && table[i][j - 1] >= 0)
 	{
 		int angle = (*m_vParts)[table[i][j - 1] - 1]->getRotation();
-		leftpeek = 0 - ((*m_vParts)[table[i][j - 1] - 1]->getRightAfterRotate(angle));
+		leftpeek = 0 - ((*m_vParts)[table[i][j - 1] - 1]->getEdgeAfterRotate(angle, RIGHT));
 	}
 	if (i > 0 && table[i - 1][j] >= 0)
 	{
 		int angle = (*m_vParts)[table[i - 1][j] - 1]->getRotation();
-		toppeek = 0 - ((*m_vParts)[table[i - 1][j] - 1]->getBottomAfterRotate(angle));
+		toppeek = 0 - ((*m_vParts)[table[i - 1][j] - 1]->getEdgeAfterRotate(angle, BOTTOM));
 	}
 	if(j == (size_t)tab.getCols() - 1)   //last in line (e.g. frame part)
 		rightpeek = 0;
@@ -249,6 +249,85 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 	}
 	return -1;
 }
+
+void Puzzle::getFramePeeks(int i, int j, int& leftpeek, int& toppeek, int& rightpeek, int& bottompeek, Table& tab)
+{
+	int** table = tab.getTable();
+	if (i == 0) //Top edge
+	{
+		rightpeek = bottompeek = -2;
+		toppeek = 0;
+
+		if (j == 0)		//Top-Left corner
+			leftpeek = 0;
+		else
+		{
+			int angle = (*m_vParts)[table[i][j - 1] - 1]->getRotation();
+			leftpeek = 0 - ((*m_vParts)[table[i][j - 1] - 1]->getEdgeAfterRotate(angle, RIGHT));
+
+			if (j == (size_t)tab.getCols() - 1) //Top-Right corner
+				rightpeek = 0;
+		}
+
+	}
+
+	if (j == (size_t)tab.getCols() - 1 && i != 0) //Right edge, not a Right-Top corner
+	{
+		leftpeek = bottompeek = -2;
+		rightpeek = 0;
+
+		int angle = (*m_vParts)[table[i - 1][j] - 1]->getRotation();
+		toppeek = 0 - ((*m_vParts)[table[i - 1][j] - 1]->getEdgeAfterRotate(angle, BOTTOM));
+
+		if (i == (size_t)tab.getRows() - 1) //Bottom-Right corner
+			bottompeek = 0;
+	}
+
+	if (i == (size_t)tab.getRows() - 1 && j != (size_t)tab.getCols() - 1) //Bottom edge, not a Right-Bottom corner
+	{
+		leftpeek = toppeek = -2;
+		bottompeek = 0;
+
+		int angle = (*m_vParts)[table[i][j + 1] - 1]->getRotation();
+		rightpeek = 0 - ((*m_vParts)[table[i][j + 1] - 1]->getEdgeAfterRotate(angle, LEFT));
+
+		if (j == 0) //Bottom-Left corner
+			leftpeek = 0;
+	}
+
+	if (j == 0 && i != (size_t)tab.getRows() - 1 && i != 0) //Left edge, not a corner 
+	{
+		rightpeek = toppeek = -2;
+		leftpeek = 0;
+
+		int angle = (*m_vParts)[table[i + 1][j] - 1]->getRotation();
+		bottompeek = 0 - ((*m_vParts)[table[i + 1][j] - 1]->getEdgeAfterRotate(angle, TOP));
+	}
+
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+int Puzzle::solveFrameRec(size_t i, size_t j, Table& tab)
+{
+	int** table = tab.getTable();
+	list<shared_ptr<Part>> matches;
+	enum edge currentEdge;
+
+	int leftpeek, toppeek, rightpeek, bottompeek;
+
+	getFramePeeks(i, j, leftpeek, toppeek, rightpeek, bottompeek, tab);
+	
+	currentEdge = TOP_EDGE;
+
+	matches = getFrameMatches(leftpeek, toppeek, rightpeek, bottompeek, currentEdge);
+
+
+
+
+	
+}
+
 
 vector<int> Puzzle::getMostProbableRowSizes()
 {
@@ -344,4 +423,71 @@ void Puzzle::preComputeCommonCase()
 	for (int i = -1; i < 2; i++)
 		for (int j = -1; j < 2; j++)
 			m_mMatches[make_pair(i, j)] = getMatches(i, j, -2, -2);
+}
+
+
+void Puzzle::frame::addPart(shared_ptr<Part> p)
+{
+	int relevantSide;
+	switch (e)
+	{
+	case TOP:
+		relevantSide = p->getLeft();
+		break;
+	case RIGHT:
+		relevantSide = p->getTop();
+		break;
+	case BOTTOM:
+		relevantSide = p->getRight();
+		break;
+	case LEFT:
+		relevantSide = p->getBottom();
+		break;
+	}
+
+	switch (relevantSide)
+	{
+	case -1:
+		females.push_back(p);
+		break;
+	case 0:
+		straights.push_back(p);
+		break;
+	case 1:
+		males.push_back(p);
+		break;
+	}
+}
+
+void Puzzle::frame::removePart(shared_ptr<Part> p)
+{
+	int relevantSide;
+	switch (e)
+	{
+	case TOP:
+		relevantSide = p->getLeft();
+		break;
+	case RIGHT:
+		relevantSide = p->getTop();
+		break;
+	case BOTTOM:
+		relevantSide = p->getRight();
+		break;
+	case LEFT:
+		relevantSide = p->getBottom();
+		break;
+	}
+
+	switch (relevantSide)
+	{
+	case -1:
+		females.remove(p);
+		break;
+	case 0:
+		straights.remove(p);
+		break;
+	case 1:
+		males.remove(p);
+		break;
+	}
 }

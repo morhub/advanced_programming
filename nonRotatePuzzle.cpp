@@ -12,7 +12,7 @@ using std::endl;
 using std::pair;
 
 
-nonRotatePuzzle::nonRotatePuzzle()
+nonRotatePuzzle::nonRotatePuzzle(): topFrame(TOP_EDGE), rightFrame(RIGHT_EDGE), bottomFrame(BOTTOM_EDGE), leftFrame(LEFT_EDGE)
 {
 	for (int i = -1; i < 2; i++)
 	{
@@ -59,6 +59,16 @@ void nonRotatePuzzle::initPartsMap()
 		b = p->getBottom();
 
 		m_mPartMap[make_pair(l, t)][make_pair(r, b)]->push_back(p);
+
+		if (l == 0)
+			leftFrame.addPart(p);
+		if (t == 0)
+			topFrame.addPart(p);
+		if (r == 0)
+			rightFrame.addPart(p);
+		if (b == 0)
+			bottomFrame.addPart(p);
+
 	}
 }
 
@@ -275,3 +285,41 @@ list<pair<list<shared_ptr<Part>>*, list<int>>> nonRotatePuzzle::getMatches(int l
 
 	return retlist;
 }
+
+
+list<shared_ptr<Part>> nonRotatePuzzle::getFrameMatches(int left, int top, int right, int bottom, enum edge e)
+{
+	list<shared_ptr<Part>> retlist;
+	switch(e)
+	{
+	case LEFT_EDGE:
+		retlist = leftFrame.getParts(bottom);
+		break;
+	case TOP_EDGE:
+		retlist = topFrame.getParts(left);
+		break;
+	case BOTTOM_EDGE:
+		retlist = bottomFrame.getParts(right);
+		break;
+	case RIGHT_EDGE:
+		retlist = rightFrame.getParts(top);
+		break;
+	}
+	
+	retlist.erase(std::remove_if(retlist.begin(), retlist.end(),
+		[left, top, right, bottom](const shared_ptr<Part> p) {
+
+		int _right  = (right == -2)  ? p->getRight() : right;
+		int _bottom = (bottom == -2) ? p->getBottom() : bottom;
+		int _top	= (top == -2)    ? p->getTop() : top;
+		int _left	= (left == -2)   ? p->getLeft() : left;
+
+		return (_left != p->getLeft() || _top != p->getTop() || _right != p->getRight() || _bottom != p->getBottom());
+	}),
+		retlist.end()
+		);
+
+	return retlist;
+}
+
+

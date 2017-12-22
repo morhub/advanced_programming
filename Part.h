@@ -11,7 +11,7 @@ using namespace std;
 #define MODULO(a,b) (a%b+b)%b
 
 enum direction {
-	LEFT,
+	LEFT=0,
 	TOP,
 	RIGHT,
 	BOTTOM
@@ -36,8 +36,8 @@ public:
 	void setCorner(bool b)		{ m_bCorner = b; }
 	void setRotation(int angle) { rotateAngle = MODULO(angle, 4); }
 
-	int getRightAfterRotate(int angle);
-	int getBottomAfterRotate(int angle);
+	int getEdgeAfterRotate(int angle, enum direction dir);
+
 	bool isSpecial();
 
 	

@@ -13,6 +13,14 @@
 #include <list>
 using namespace std;
 
+enum edge {
+	LEFT_EDGE,
+	TOP_EDGE,
+	RIGHT_EDGE,
+	BOTTOM_EDGE
+};
+
+
 class Table;
 
 class Puzzle
@@ -70,11 +78,38 @@ public:
 	virtual void initPartsMap() = 0;
 	virtual list<pair<list<shared_ptr<Part>>*, list<int>>> getMatches(int left, int top, int right, int bottom) = 0;
 
+	class frame {
+	public:
+		enum edge e;
+		list<shared_ptr<Part>> straights;
+		list<shared_ptr<Part>> males;
+		list<shared_ptr<Part>> females;
+
+		frame(enum edge _e) : e(_e) {}
+
+		void addPart(shared_ptr<Part> p);
+		void removePart(shared_ptr<Part> p);
+
+		list<shared_ptr<Part>> getParts(int connection) {
+			if (connection == 0) return straights;
+			else if (connection == 1) return males;
+			else return females;
+		}
+
+
+	};
+
 private:
 	/*
-	 * internal recursive call from Solve()
+	 * internal recursive call from Solve(), for "serial" solution
 	 */
 	int solveRec(size_t i, size_t j, Table& tab);
+
+	/*
+	* internal recursive call from Solve(), for "frame-first" solution 
+	*/
+	int solveFrameRec(size_t i, size_t j, Table& tab);
+
 
 	/* Assuming that all "middle" parts are equaly distributed with 1,0,-1 edges,
 	 * a difference between number of left and top straight edges will probably come
@@ -86,6 +121,10 @@ private:
 
 protected:
 	void preComputeCommonCase();
+	void getFramePeeks(int i, int j, int& leftpeek, int& toppeek, int& rightpeek, int& bottompeek, Table& tab);
+
+	virtual list<shared_ptr<Part>> getFrameMatches(int left, int top, int right, int bottom, enum edge e)=0;
+
 };
 
 

@@ -99,7 +99,7 @@ list<int> Part::getPermutations(int left, int top, int right, int bottom)
 //}
 
 
-int Part::getRightAfterRotate(int angle)
+int Part::getEdgeAfterRotate(int angle, enum direction dir)
 {
 	vector<int> p(4);
 	p.at(0) = this->getLeft();
@@ -114,26 +114,8 @@ int Part::getRightAfterRotate(int angle)
 			p.end());
 	}
 
-	return p.at(2); //right after rotation
-}
 
-
-int Part::getBottomAfterRotate(int angle)
-{
-	vector<int> p(4);
-	p.at(0) = this->getLeft();
-	p.at(1) = this->getTop();
-	p.at(2) = this->getRight();
-	p.at(3) = this->getBottom();
-
-	for (int i = 0; i < angle; i++)
-	{
-		rotate(p.begin(),
-			p.end() - 1, // this will be the new first element
-			p.end());
-	}
-
-	return p.at(3); //right after rotation
+	return p.at(dir); //right after rotation
 }
 
 
