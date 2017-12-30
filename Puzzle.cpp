@@ -18,6 +18,10 @@ using std::getline;
 using std::string;
 using std::endl;
 using std::pair;
+using std::mutex;
+using std::lock;
+
+static std::mutex print_mutex;
 
 Table foo(int i) {
 	return Table();
@@ -295,13 +299,22 @@ vector<int> Puzzle::getMostProbableRowSizes()
 
 Table Puzzle::solveThread(const int rows)
 {
+	print_mutex.lock();
 	printf("started thread of rows %d\n", rows);
+	print_mutex.unlock();
 	Table table(rows, m_iNumOfElements / rows);
+	if (Puzzle::solveRec(0, 0, table) == 0) {
+		print_mutex.lock();
+		printf("thread of rows %d: setSolved\n", rows);
+		print_mutex.unlock();
 	auto vPartsCopy = m_vParts;
 	//auto 
 	if(Puzzle::solveRec(0, 0, table) == 0)
 		table.setSolved();
+	}
+	print_mutex.lock();
 	printf("finished thread of rows %d, solved: %d\n", rows, table.isSolved());
+	print_mutex.unlock();
 	//Sleep(5000);
 	return table;
 }
@@ -322,32 +335,49 @@ Table Puzzle::Solve(int numThreads)
 	}
 	else {
 		for (const auto& i : possibleRows) {
+			print_mutex.lock();
 			printf("*** rows %d ***\n", i);
+			print_mutex.unlock();
 			if (numThreads > 0) {
+				print_mutex.lock();
 				printf("start new thread of rows %d\n", i);
+				print_mutex.unlock();
 				threads.push_back(std::async(std::launch::async, &Puzzle::solveThread, this, i));
 				numThreads--;
 			} else {
+				print_mutex.lock();
 				printf("Waiting...\n");
-				for (int j = 0; j < (int)threads.size(); j = (j++) % threads.size())
+				print_mutex.unlock();
+				for (int j = 0; j < (int)threads.size(); j = (j+1) % threads.size())
 				{
+					print_mutex.lock();
 					printf("Wait for thread num %d\n", j);
+					print_mutex.unlock();
 					if (threads[j].wait_for(span) != std::future_status::timeout) {
+						print_mutex.lock();
 						printf("thread %d finished\n", j);
+						print_mutex.unlock();
 						Table& table = threads[j].get();
 						if (table.isSolved()) {
+							print_mutex.lock();
 							printf("thread %d solved!!!\n", j);
+							print_mutex.unlock();
 							for (auto& thread : threads) {
 								if (thread.valid())
 									thread.wait();
 							}
+							print_mutex.lock();
 							printf("Finished waiting after solved, return table\n");
+							print_mutex.unlock();
 							return table;
 						}
 						else {
+							print_mutex.lock();
 							printf("thread %d didn't solve...\n", j);
 							printf("start new thread of rows %d\n", i);
+							print_mutex.unlock();
 							threads[j] = std::async(std::launch::async, &Puzzle::solveThread, this, i);
+							break;
 						}
 					}
 				}
