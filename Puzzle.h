@@ -15,6 +15,9 @@ using namespace std;
 
 class Table;
 
+typedef map<pair<int, int>, list<pair<list<Part*>*, list<int>>>>			common_match_t;
+typedef map<tuple<int, int, int, int>, list<pair<list<Part*>*, list<int>>>> full_match_t;
+
 //static global variable that should signal all threads that
 //someone has got a solution to the problem and they can close themselves
 static bool winner = false;
@@ -23,7 +26,8 @@ class Puzzle
 {
 protected:
 	vector<Part> m_vParts;
-	map<pair<int, int>, list<pair<list<Part*>*, list<int>>>> m_mMatches;
+	map<pair<int, int>, list<pair<list<Part*>*, list<int>>>> m_mCommonMatches;
+	map<tuple<int, int, int, int>, list<pair<list<Part*>*, list<int>>>> m_mFullMatches;
 	size_t m_iNumOfElements;
 	ofstream* fout;
 
@@ -80,7 +84,7 @@ private:
 	 * internal recursive call from Solve()
 	 */
 	Table Puzzle::solveThread(int rows);
-	int solveRec(size_t i, size_t j, Table& tab);
+	int solveRec(size_t i, size_t j, Table& tab, common_match_t& cm,full_match_t& fm);
 
 	/* Assuming that all "middle" parts are equaly distributed with 1,0,-1 edges,
 	 * a difference between number of left and top straight edges will probably come
@@ -90,8 +94,18 @@ private:
 	 */
 	vector<int> getMostProbableRowSizes();
 
+	/* update the maps pointers such that each thread will eventually point to a copy of
+	* m_vparts, and also update this copy, so threads won't collide while solving the puzzle
+	*
+	*/
+	void Puzzle::updatePointersPerThread(common_match_t& cm, full_match_t& fm, vector<Part>& vPartsCopy);
+
+	void copyAndUpdateCommonMatch(vector<Part>& vPartsCopy, common_match_t& cm);
+	void copyAndUpdateFullMatch(vector<Part>& vPartsCopy, full_match_t& fm);
+
 protected:
 	void preComputeCommonCase();
+	void preComputeFullCase();
 };
 
 

@@ -180,7 +180,7 @@ int Puzzle::init(std::string path)
 }
 
 
-int Puzzle::solveRec(size_t i, size_t j, Table& tab)
+int Puzzle::solveRec(size_t i, size_t j, Table& tab, common_match_t& cm, full_match_t& fm)
 {
 	int** table = tab.getTable();
 	list<pair<list<Part*>*, list<int>>> matches;
@@ -209,9 +209,9 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 	 * So we can use memoization to avoid redundant getMatches() computations
 	 */
 	if (rightpeek == -2 && bottompeek == -2) //common case in our algorithm
-		matches = m_mMatches[make_pair(leftpeek, toppeek)];
+		matches = cm[make_pair(leftpeek, toppeek)];
 	else
-		matches = getMatches(leftpeek, toppeek, rightpeek, bottompeek);
+		matches = fm[make_tuple(leftpeek, toppeek, rightpeek, bottompeek)];
 
 	//We always check the top-left directions - 
 	//solve the puzzle from top-left to bottom-right
@@ -238,7 +238,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 			//End of line
 			if (j == (size_t)tab.getCols() - 1)
 			{
-				if (solveRec(i + 1, 0, tab) == 0) //move to the next line, and first column
+				if (solveRec(i + 1, 0, tab, cm, fm) == 0) //move to the next line, and first column
 					return 0;
 				else
 				{
@@ -248,7 +248,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 			}
 			else // "middle" cell in line
 			{
-				if (solveRec(i, j + 1, tab) == 0) //continue solving along the current line
+				if (solveRec(i, j + 1, tab, cm, fm) == 0) //continue solving along the current line
 					return 0;
 				else
 				{
@@ -297,24 +297,136 @@ vector<int> Puzzle::getMostProbableRowSizes()
 	return sizes;
 }
 
+
+void Puzzle::updatePointersPerThread(common_match_t& cm, full_match_t& fm, vector<Part>& vPartsCopy)
+{
+	//common case
+	printf("common case\n");
+	for (int i = -1; i < 2; i++)
+	{
+		for (int j = -1; j < 2; j++)
+		{
+			printf("common case 1 \n");
+			auto common = cm[make_pair(i, j)];
+			printf("common case 2 \n");
+			for (auto &match : common)
+			{
+				printf("common case 3\n");
+				list<Part*> partList = *(match.first);
+				printf("common case 4\n");
+				for (Part*& p : partList)
+				{
+					printf("common case 5 %d, copy: %p\n", p->getId(), &vPartsCopy.at(0));
+					p = &vPartsCopy.at(p->getId() - 1);
+					printf("common case 6\n");
+				}
+			}
+		}
+	}
+
+
+	//full case
+	printf("full case\n");
+
+	for (int i = -2; i < 2; i++)
+	{
+		for (int j = -2; j < 2; j++)
+		{
+			for (int k = -2; k < 2; k++)
+			{
+				for (int l = -2; l < 2; l++)
+				{
+					auto full = fm[make_tuple(i, j, k, l)];
+					for (auto &match : full)
+					{
+						auto& partList = match.first;
+						for (auto& p : *partList)
+						{
+							p = &vPartsCopy.at(p->getId() - 1);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
+void Puzzle::copyAndUpdateCommonMatch(vector<Part>& vPartsCopy, common_match_t& cm)
+{
+	for (int i = -1; i < 2; i++)
+	{
+		for (int j = -1; j < 2; j++)
+		{
+			//ret[make_pair(i, j)] = m_mCommonMatches[make_pair(i,j)];
+			//list<pair<list<Part*>*, list<int>>>& copylist = cm[make_pair(i, j)];
+			for (pair<list<Part*>*, list<int>>& match : cm[make_pair(i, j)])
+			{
+				list<Part*>* orig_list = match.first;
+				match.first = new list<Part*>();
+				for (Part* p : *orig_list)
+					match.first->push_back(&vPartsCopy.at(p->getId() - 1));
+			}
+		}
+	}
+}
+
+
+void Puzzle::copyAndUpdateFullMatch(vector<Part>& vPartsCopy, full_match_t& fm)
+{
+	for (int i = -2; i < 2; i++)
+	{
+		for (int j = -2; j < 2; j++)
+		{
+			for (int k = -2; k < 2; k++)
+			{
+				for (int l = -2; l < 2; l++)
+				{
+					for (pair<list<Part*>*, list<int>>& match : fm[make_tuple(i, j, k, l)])
+					{
+						list<Part*>* orig_list = match.first;
+						match.first = new list<Part*>();
+						for (Part* p : *orig_list)
+							match.first->push_back(&vPartsCopy.at(p->getId() - 1));
+					}
+				}
+			}
+		}
+	}
+}
+		
+
 Table Puzzle::solveThread(const int rows)
 {
 	print_mutex.lock();
 	printf("started thread of rows %d\n", rows);
 	print_mutex.unlock();
+
 	Table table(rows, m_iNumOfElements / rows);
-	if (Puzzle::solveRec(0, 0, table) == 0) {
+	auto vPartsCopy = m_vParts;
+	common_match_t cm =  m_mCommonMatches;//copyAndUpdateCommonMatch(vPartsCopy);//
+	full_match_t fm =  m_mFullMatches;//copyAndUpdateFullMatch(vPartsCopy);//
+
+	copyAndUpdateCommonMatch(vPartsCopy, cm);
+	copyAndUpdateFullMatch(vPartsCopy, fm);
+	
+	//updatePointersPerThread(cm, fm, vPartsCopy);
+	
+	printf("before solveRec\n");
+
+	if (Puzzle::solveRec(0, 0, table, cm, fm) == 0) {
 		print_mutex.lock();
 		printf("thread of rows %d: setSolved\n", rows);
 		print_mutex.unlock();
-	auto vPartsCopy = m_vParts;
-	//auto 
-	if(Puzzle::solveRec(0, 0, table) == 0)
+
 		table.setSolved();
+		m_vParts = vPartsCopy; //the chosen one
 	}
+	
 	print_mutex.lock();
 	printf("finished thread of rows %d, solved: %d\n", rows, table.isSolved());
 	print_mutex.unlock();
+
 	//Sleep(5000);
 	return table;
 }
@@ -322,6 +434,7 @@ Table Puzzle::solveThread(const int rows)
 Table Puzzle::Solve(int numThreads)
 {
 	preComputeCommonCase();
+	preComputeFullCase();
 	std::chrono::milliseconds span(10);
 	vector<std::future<Table>> threads;
 
@@ -329,39 +442,49 @@ Table Puzzle::Solve(int numThreads)
 	if (numThreads == 0) {
 		for (const auto& i : possibleRows) {
 			Table table(i, m_iNumOfElements / i);
-			if (solveRec(0, 0, table) == 0) //add parameter m_map 
+			if (solveRec(0, 0, table, m_mCommonMatches, m_mFullMatches) == 0) 
 				return table;
 		}
 	}
 	else {
 		for (const auto& i : possibleRows) {
+			
 			print_mutex.lock();
 			printf("*** rows %d ***\n", i);
 			print_mutex.unlock();
+			
 			if (numThreads > 0) {
+				
 				print_mutex.lock();
 				printf("start new thread of rows %d\n", i);
 				print_mutex.unlock();
+				
 				threads.push_back(std::async(std::launch::async, &Puzzle::solveThread, this, i));
 				numThreads--;
 			} else {
+				
 				print_mutex.lock();
 				printf("Waiting...\n");
 				print_mutex.unlock();
+				
 				for (int j = 0; j < (int)threads.size(); j = (j+1) % threads.size())
 				{
 					print_mutex.lock();
 					printf("Wait for thread num %d\n", j);
 					print_mutex.unlock();
+					
 					if (threads[j].wait_for(span) != std::future_status::timeout) {
 						print_mutex.lock();
 						printf("thread %d finished\n", j);
 						print_mutex.unlock();
+						
 						Table& table = threads[j].get();
+						
 						if (table.isSolved()) {
 							print_mutex.lock();
 							printf("thread %d solved!!!\n", j);
 							print_mutex.unlock();
+							
 							for (auto& thread : threads) {
 								if (thread.valid())
 									thread.wait();
@@ -376,6 +499,7 @@ Table Puzzle::Solve(int numThreads)
 							printf("thread %d didn't solve...\n", j);
 							printf("start new thread of rows %d\n", i);
 							print_mutex.unlock();
+							
 							threads[j] = std::async(std::launch::async, &Puzzle::solveThread, this, i);
 							break;
 						}
@@ -386,12 +510,16 @@ Table Puzzle::Solve(int numThreads)
 
 		//wait for last threads to finish too
 		for (auto& thread : threads)
-			thread.wait();
+			if (thread.valid())
+				thread.wait();
 
 		for (auto& thread : threads) {
-			Table& table = thread.get();
-			if (table.isSolved())
-				return table;
+			if (thread.valid())
+			{
+				Table& table = thread.get();
+				if (table.isSolved())
+					return table;
+			}
 		}
 	}
 	
@@ -444,5 +572,16 @@ void Puzzle::preComputeCommonCase()
 	//pre-compute the common case (no right,bottom edges)
 	for (int i = -1; i < 2; i++)
 		for (int j = -1; j < 2; j++)
-			m_mMatches[make_pair(i, j)] = getMatches(i, j, -2, -2);
+			m_mCommonMatches[make_pair(i, j)] = getMatches(i, j, -2, -2);
+}
+
+
+void Puzzle::preComputeFullCase()
+{
+	//pre-compute the full case (no right,bottom edges)
+	for (int i = -2; i < 2; i++)
+		for (int j = -2; j < 2; j++)
+			for (int k = -2; k < 2; k++)
+				for (int l = -2; l < 2; l++)
+					m_mFullMatches[make_tuple(i, j, k, l)] = getMatches(i, j, k, l);
 }

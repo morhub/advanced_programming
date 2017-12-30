@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 	bool rotate;
 	Puzzle* puz;
 	string Rotate = "-rotate";
-	int threads = 0;
+	int threads = 2;
 
 	switch (argc) {
 	case 3:
