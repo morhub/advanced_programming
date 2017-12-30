@@ -57,7 +57,7 @@ int Puzzle::init(std::string path)
 			*fout << "Invalid NumOfElements" << endl;
 		}
 	}
-	shared_ptr<vector<shared_ptr<Part>>> Parts = make_shared<vector<shared_ptr<Part>>>(m_iNumOfElements);
+	shared_ptr<vector<Part>> Parts = make_shared<vector<Part>>(m_iNumOfElements);
 
 	while (input && getline(input, line) && line.length()!=0) {
 		int id, left, up, right, down, eol;
@@ -113,13 +113,13 @@ int Puzzle::init(std::string path)
 			continue;
 		}
 
-		Parts->at(id-1) = make_shared<Part>(id, left, up, right, down);
+		Parts->at(id-1) = *(new Part(id, left, up, right, down));
 
 
 	}
 
 	for (int i = 0; i < (int)Parts->size(); i++) {
-		Part& p = *Parts->at(i);
+		Part& p = Parts->at(i);
 		if(!p.getId()) { //only missing, not wrong ID
 			missingIds.emplace_back(std::to_string(i+1));
 			rc = -1;
@@ -171,7 +171,7 @@ int Puzzle::init(std::string path)
 	{
 		*fout << "Puzzle ID " << line.first << " has wrong data: " << line.second << endl;
 	}
-	m_vParts = Parts;
+	m_vParts = *Parts;
 	return rc;
 }
 
@@ -179,7 +179,7 @@ int Puzzle::init(std::string path)
 int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 {
 	int** table = tab.getTable();
-	list<pair<list<shared_ptr<Part>>*, list<int>>> matches;
+	list<pair<list<Part>*, list<int>>> matches;
 
 	int leftpeek, toppeek, rightpeek, bottompeek;
 	rightpeek = bottompeek = -2; //there is no part to the right/bottom
@@ -187,13 +187,13 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 
 	if (j > 0 && table[i][j - 1] >= 0)
 	{
-		int angle = (*m_vParts)[table[i][j - 1] - 1]->getRotation();
-		leftpeek = 0 - ((*m_vParts)[table[i][j - 1] - 1]->getRightAfterRotate(angle));
+		int angle = (m_vParts)[table[i][j - 1] - 1].getRotation();
+		leftpeek = 0 - ((m_vParts)[table[i][j - 1] - 1].getRightAfterRotate(angle));
 	}
 	if (i > 0 && table[i - 1][j] >= 0)
 	{
-		int angle = (*m_vParts)[table[i - 1][j] - 1]->getRotation();
-		toppeek = 0 - ((*m_vParts)[table[i - 1][j] - 1]->getBottomAfterRotate(angle));
+		int angle = (m_vParts)[table[i - 1][j] - 1].getRotation();
+		toppeek = 0 - ((m_vParts)[table[i - 1][j] - 1].getBottomAfterRotate(angle));
 	}
 	if(j == (size_t)tab.getCols() - 1)   //last in line (e.g. frame part)
 		rightpeek = 0;
@@ -213,7 +213,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 	//solve the puzzle from top-left to bottom-right
 	for (auto& match : matches)
 	{
-		list<shared_ptr<Part>>* matchlist = match.first;
+		list<Part>* matchlist = match.first;
 		list<int> rotations = match.second;
 
 		//no parts of this left-top edges are avilable
@@ -221,12 +221,12 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 			continue;
 
 		//if we got so far, we have match in this list - continue checking this part
-		shared_ptr<Part> current = matchlist->front();
+		Part& current = matchlist->front();
 		matchlist->pop_front();
-		table[i][j] = current->getId();
+		table[i][j] = current.getId();
 		for (auto& rotation : rotations)
 		{
-			current->addRotation(rotation);
+			current.addRotation(rotation);
 			//End of table
 			if ((i == (size_t)tab.getRows() - 1) && (j == (size_t)tab.getCols() - 1))
 				return 0; //solve succeeded
@@ -238,7 +238,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 					return 0;
 				else
 				{
-					current->addRotation(-rotation);
+					current.addRotation(-rotation);
 					continue;
 				}
 			}
@@ -248,7 +248,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 					return 0;
 				else
 				{
-					current->addRotation(-rotation);
+					current.addRotation(-rotation);
 					continue;
 				}
 			}
@@ -272,8 +272,8 @@ vector<int> Puzzle::getMostProbableRowSizes()
 	int leftStraight = 0;
 	int topStraight = 0;
 	for (size_t i = 0; i < m_iNumOfElements; i++){
-		int left = (*m_vParts)[i]->getLeft();
-		int top = (*m_vParts)[i]->getTop();
+		int left = (m_vParts)[i].getLeft();
+		int top =  (m_vParts)[i].getTop();
 		if (left == 0)
 			leftStraight++;
 		if (top == 0)
@@ -297,7 +297,9 @@ Table Puzzle::solveThread(const int rows)
 {
 	printf("started thread of rows %d\n", rows);
 	Table table(rows, m_iNumOfElements / rows);
-	if (Puzzle::solveRec(0, 0, table) == 0)
+	auto vPartsCopy = m_vParts;
+	//auto 
+	if(Puzzle::solveRec(0, 0, table) == 0)
 		table.setSolved();
 	printf("finished thread of rows %d, solved: %d\n", rows, table.isSolved());
 	Sleep(5000);
@@ -393,10 +395,10 @@ int Puzzle::preProcess()
 
 	for (size_t i = 0; i < m_iNumOfElements; i++)
 	{
-		sum += (*m_vParts)[i]->getLeft();
-		sum += (*m_vParts)[i]->getTop();
-		sum += (*m_vParts)[i]->getRight();
-		sum += (*m_vParts)[i]->getBottom();
+		sum += (m_vParts)[i].getLeft();
+		sum += (m_vParts)[i].getTop();
+		sum += (m_vParts)[i].getRight();
+		sum += (m_vParts)[i].getBottom();
 	}
 	if (sum != 0)
 	{

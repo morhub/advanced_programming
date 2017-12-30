@@ -22,8 +22,8 @@ static bool winner = false;
 class Puzzle
 {
 protected:
-	shared_ptr<vector<shared_ptr<Part>>> m_vParts;
-	map<pair<int, int>, list<pair<list<shared_ptr<Part>>*, list<int>>>> m_mMatches;
+	vector<Part> m_vParts;
+	map<pair<int, int>, list<pair<list<Part>*, list<int>>>> m_mMatches;
 	size_t m_iNumOfElements;
 	ofstream* fout;
 
@@ -31,7 +31,7 @@ public:
 	int getNumOfElements()  { return m_iNumOfElements; }
 	virtual int getMaxPossibleRows() { return m_iNumOfElements; }
 	void setOutputStream(std::ofstream* f) { fout = f; }
-	shared_ptr<Part> getPartAt(int index) { return m_vParts->at(index); }
+	Part& getPartAt(int index) { return m_vParts.at(index); }
 
 	/*
 	 * Creates an unsolved Puzzle out of input file path
@@ -73,7 +73,7 @@ public:
 	 * to make better use of puzzle different solution modes (rotate/non-rotate mode)
 	 */
 	virtual void initPartsMap() = 0;
-	virtual list<pair<list<shared_ptr<Part>>*, list<int>>> getMatches(int left, int top, int right, int bottom) = 0;
+	virtual list<pair<list<Part>*, list<int>>> getMatches(int left, int top, int right, int bottom) = 0;
 
 private:
 	/*

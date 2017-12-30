@@ -22,7 +22,7 @@ nonRotatePuzzle::nonRotatePuzzle()
 			{
 				for (int s = -1; s < 2; s++)
 				{
-					m_mPartMap[make_pair(i, j)][make_pair(k, s)] = new list<shared_ptr<Part>>();
+					m_mPartMap[make_pair(i, j)][make_pair(k, s)] = new list<Part>();
 				}
 			}
 		}
@@ -52,11 +52,11 @@ void nonRotatePuzzle::initPartsMap()
 	int l, t, r, b;
 	for (size_t i = 0; i < m_iNumOfElements; i++)
 	{
-		shared_ptr<Part> p = m_vParts->at(i);
-		l = p->getLeft();
-		t = p->getTop();
-		r = p->getRight();
-		b = p->getBottom();
+		Part& p = m_vParts.at(i);
+		l = p.getLeft();
+		t = p.getTop();
+		r = p.getRight();
+		b = p.getBottom();
 
 		m_mPartMap[make_pair(l, t)][make_pair(r, b)]->push_back(p);
 	}
@@ -69,8 +69,8 @@ bool nonRotatePuzzle::isValidStraightEdges(int sizei, int sizej)
 	int topStraight = 0;
 	for (size_t i = 0; i < m_iNumOfElements; i++)
 	{
-		int left = (*m_vParts)[i]->getLeft();
-		int top = (*m_vParts)[i]->getTop();
+		int left = (m_vParts)[i].getLeft();
+		int top =  (m_vParts)[i].getTop();
 
 		if (left == 0)
 			leftStraight++;
@@ -94,13 +94,13 @@ int nonRotatePuzzle::preProcess()
 
 	for (size_t i = 0; i < m_iNumOfElements; i++)
 	{
-		if ((*m_vParts)[i]->getLeft() == 0)
+		if ((m_vParts)[i].getLeft() == 0)
 			leftStraight++;
-		if ((*m_vParts)[i]->getTop() == 0)
+		if ((m_vParts)[i].getTop() == 0)
 			topStraight++;
-		if ((*m_vParts)[i]->getRight() == 0)
+		if ((m_vParts)[i].getRight() == 0)
 			rightStraight++;
-		if ((*m_vParts)[i]->getBottom() == 0)
+		if ((m_vParts)[i].getBottom() == 0)
 			bottomStraight++;
 	}
 
@@ -119,119 +119,119 @@ bool nonRotatePuzzle::cornerCheck(bool &tr, bool &tl, bool &br, bool &bl)
 {
 	//the easy case - only one element
 	if (m_iNumOfElements == 1) {
-		shared_ptr<Part> p = (*m_vParts)[0];
-		tr = p->getTop() == 0 && p->getRight() == 0;
-		tl = p->getTop() == 0 && p->getLeft() == 0;
-		br = p->getBottom() == 0 && p->getRight() == 0;
-		bl = p->getBottom() == 0 && p->getLeft() == 0;
+		Part& p = (m_vParts)[0];
+		tr = p.getTop() == 0	&& p.getRight() == 0;
+		tl = p.getTop() == 0	&& p.getLeft() == 0;
+		br = p.getBottom() == 0 && p.getRight() == 0;
+		bl = p.getBottom() == 0 && p.getLeft() == 0;
 		return (tr && tl && br && bl);
 	}
 
 	//the regular case - different 4 corner parts
 	for (size_t i = 0; i < m_iNumOfElements; i++)
 	{
-		shared_ptr<Part> pi = (*m_vParts)[i];
-		if (pi->getTop() == 0 && pi->getRight() == 0)
+		Part& pi = (m_vParts)[i];
+		if (pi.getTop() == 0 && pi.getRight() == 0)
 		{
-			pi->setCorner(true);
+			pi.setCorner(true);
 			for (size_t j = 0; j < m_iNumOfElements; j++)
 			{
-				shared_ptr<Part> pj = (*m_vParts)[j];
-				if (!pj->isCorner() && pj->getTop() == 0 && pj->getLeft() == 0)
+				Part& pj = (m_vParts)[j];
+				if (!pj.isCorner() && pj.getTop() == 0 && pj.getLeft() == 0)
 				{
-					pj->setCorner(true);
+					pj.setCorner(true);
 					for (size_t k = 0; k < m_iNumOfElements; k++)
 					{
-						shared_ptr<Part> pk = (*m_vParts)[k];
-						if (!pk->isCorner() && pk->getBottom() == 0 && pk->getRight() == 0)
+						Part& pk = (m_vParts)[k];
+						if (!pk.isCorner() && pk.getBottom() == 0 && pk.getRight() == 0)
 						{
-							pk->setCorner(true);
+							pk.setCorner(true);
 							for (size_t m = 0; m < m_iNumOfElements; m++)
 							{
-								shared_ptr<Part> pm = (*m_vParts)[m];
-								if (!pm->isCorner() && pm->getBottom() == 0 && pm->getLeft() == 0)
+								Part& pm = (m_vParts)[m];
+								if (!pm.isCorner() && pm.getBottom() == 0 && pm.getLeft() == 0)
 								{
-									pm->setCorner(true);
+									pm.setCorner(true);
 									return true;
 								}
 							}
-							pk->setCorner(false);
+							pk.setCorner(false);
 						}
 					}
-					pj->setCorner(false);
+					pj.setCorner(false);
 				}
 			}
-			pi->setCorner(false);
+			pi.setCorner(false);
 		}
 	}
 
 	//the row case - 2 corner parts
 	for (size_t i = 0; i < m_iNumOfElements; i++)
 	{
-		shared_ptr<Part> pi = (*m_vParts)[i];
+		Part& pi = (m_vParts)[i];
 
 		//if a single part isn't straight on top/bottom, it will fail
-		if (pi->getTop() != 0 || pi->getBottom() != 0)
+		if (pi.getTop() != 0 || pi.getBottom() != 0)
 			break;
 
-		if (pi->getRight() == 0)
+		if (pi.getRight() == 0)
 		{
-			pi->setCorner(true);
+			pi.setCorner(true);
 			for (size_t j = 0; j < m_iNumOfElements; j++)
 			{
-				shared_ptr<Part> pj = (*m_vParts)[j];
-				if (!pj->isCorner() && pj->getLeft() == 0)
+				Part& pj = (m_vParts)[j];
+				if (!pj.isCorner() && pj.getLeft() == 0)
 				{
-					pj->setCorner(true);
+					pj.setCorner(true);
 					return true;
 				}
 			}
-			pi->setCorner(false);
+			pi.setCorner(false);
 		}
 	}
 
 	//the col case - 2 corner parts
 	for (size_t i = 0; i < m_iNumOfElements; i++)
 	{
-		shared_ptr<Part> pi = (*m_vParts)[i];
+		Part& pi = (m_vParts)[i];
 
 		//if a single part isn't straight on right/left, it will fail
-		if (pi->getLeft() != 0 || pi->getRight() != 0)
+		if (pi.getLeft() != 0 || pi.getRight() != 0)
 			break;
 
-		if (pi->getTop() == 0)
+		if (pi.getTop() == 0)
 		{
-			pi->setCorner(true);
+			pi.setCorner(true);
 			for (size_t j = 0; j < m_iNumOfElements; j++)
 			{
-				shared_ptr<Part> pj = (*m_vParts)[j];
-				if (!pj->isCorner() && pj->getBottom() == 0)
+				Part& pj = (m_vParts)[j];
+				if (!pj.isCorner() && pj.getBottom() == 0)
 				{
-					pj->setCorner(true);
+					pj.setCorner(true);
 					return true;
 				}
 			}
-			pi->setCorner(false);
+			pi.setCorner(false);
 		}
 	}
 
 	// if we got so far, it means there is no available solution (not enough corners)!
 	for (size_t i = 0; i < m_iNumOfElements; i++)
 	{
-		shared_ptr<Part> p = (*m_vParts)[i];
-		if (p->getTop() == 0 && p->getRight() == 0) {
+		Part& p = (m_vParts)[i];
+		if (p.getTop() == 0 && p.getRight() == 0) {
 			tr = true;
 			continue;
 		}
-		if (p->getTop() == 0 && p->getLeft() == 0) {
+		if (p.getTop() == 0 && p.getLeft() == 0) {
 			tl = true;
 			continue;
 		}
-		if (p->getBottom() == 0 && p->getRight() == 0) {
+		if (p.getBottom() == 0 && p.getRight() == 0) {
 			br = true;
 			continue;
 		}
-		if (p->getBottom() == 0 && p->getLeft() == 0) {
+		if (p.getBottom() == 0 && p.getLeft() == 0) {
 			bl = true;
 			continue;
 		}
@@ -239,16 +239,16 @@ bool nonRotatePuzzle::cornerCheck(bool &tr, bool &tl, bool &br, bool &bl)
 	return false;
 }
 
-list<pair<list<shared_ptr<Part>>*, list<int>>> nonRotatePuzzle::getMatches(int left, int top, int right, int bottom)
+list<pair<list<Part>*, list<int>>> nonRotatePuzzle::getMatches(int left, int top, int right, int bottom)
 {
-	list<pair<list<shared_ptr<Part>>*, list<int>>> retlist;
+	list<pair<list<Part>*, list<int>>> retlist;
 	const auto& MatchMap = m_mPartMap[make_pair(left, top)];
 
 	/* transform "map<pair<int, int>, list<Part>*>" into "list<pair<list<Part>*, int>>".
 	 * the "0" stands for zero rotation, since no rotation are allowed in this scenario */
 	std::transform(MatchMap.begin(), MatchMap.end(),
 				   std::back_inserter(retlist),
-				   [](const std::map<pair<int, int>, list<shared_ptr<Part>>*>::value_type pair)
+				   [](const std::map<pair<int, int>, list<Part>*>::value_type pair)
 					 {
 		return make_pair(pair.second, list<int>{0});
 					 }
@@ -258,17 +258,17 @@ list<pair<list<shared_ptr<Part>>*, list<int>>> nonRotatePuzzle::getMatches(int l
 		return retlist;
 
 	retlist.erase(std::remove_if(retlist.begin(), retlist.end(),
-		[right, bottom](const pair<list<shared_ptr<Part>>*, list<int>> value) {
-			list<shared_ptr<Part>>* partList = value.first;
+		[right, bottom](const pair<list<Part>*, list<int>> value) {
+			list<Part>* partList = value.first;
 			if (partList->empty())
 				return true;
 
 			auto& p = partList->front();
 			//if right/bottom doesn't exist, just set them to p.right/p.bottom
-			int _right =  (right == -2)  ? p->getRight()  : right;
-			int _bottom = (bottom == -2) ? p->getBottom() : bottom;
+			int _right =  (right == -2)  ? p.getRight()  : right;
+			int _bottom = (bottom == -2) ? p.getBottom() : bottom;
 
-			return (_right != p->getRight() || _bottom != p->getBottom());
+			return (_right != p.getRight() || _bottom != p.getBottom());
 		}),
 		retlist.end()
 	);
