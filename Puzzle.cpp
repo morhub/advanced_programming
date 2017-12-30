@@ -11,12 +11,17 @@
 #include <ctime>
 #include <future>
 #include <thread>
+#include <windows.h>
+
 
 using std::getline;
 using std::string;
 using std::endl;
 using std::pair;
 
+Table foo(int i) {
+	return Table();
+}
 
 int Puzzle::init(std::string path)
 {
@@ -288,12 +293,22 @@ vector<int> Puzzle::getMostProbableRowSizes()
 	return sizes;
 }
 
+Table Puzzle::solveThread(const int rows)
+{
+	printf("started thread of rows %d\n", rows);
+	Table table(rows, m_iNumOfElements / rows);
+	if (Puzzle::solveRec(0, 0, table) == 0)
+		table.setSolved();
+	printf("finished thread of rows %d, solved: %d\n", rows, table.isSolved());
+	Sleep(5000);
+	return table;
+}
+
 Table Puzzle::Solve(int numThreads)
 {
 	preComputeCommonCase();
 	std::chrono::milliseconds span(10);
 	vector<std::future<Table>> threads;
-	//std::future<Table> *thread;
 
 	vector<int> possibleRows = getMostProbableRowSizes();
 	if (!numThreads) {
@@ -305,28 +320,36 @@ Table Puzzle::Solve(int numThreads)
 	}
 	else {
 		for (const auto& i : possibleRows) {
+			printf("*** rows %d ***\n", i);
 			if (numThreads > 0) {
-				std::future<Table> thread = std::async(Puzzle::solveThread, i);
-				threads.push_back(thread);
+				printf("start new thread of rows %d\n", i);
+				threads.push_back(std::async(std::launch::async, &Puzzle::solveThread, this, i));
 				numThreads--;
 			} else {
-				for (int j; j < threads.size(); (j++) % threads.size()) {
+				printf("Waiting...\n");
+				for (int j = 0; j < (int)threads.size(); j = (j++) % threads.size())
+				{
+					printf("Wait for thread num %d\n", j);
 					if (threads[j].wait_for(span) != std::future_status::timeout) {
+						printf("thread %d finished\n", j);
 						Table& table = threads[j].get();
 						if (table.isSolved()) {
-							for (auto& thread : threads)
-								thread.wait();
+							printf("thread %d solved!!!\n", j);
+							for (auto& thread : threads) {
+								if (thread.valid())
+									thread.wait();
+							}
+							printf("Finished waiting after solved, return table\n");
 							return table;
 						}
 						else {
-							threads[j] = std::async(Puzzle::solveThread, i);
+							printf("thread %d didn't solve...\n", j);
+							printf("start new thread of rows %d\n", i);
+							threads[j] = std::async(std::launch::async, &Puzzle::solveThread, this, i);
 						}
 					}
 				}
 			}
-//			Table table(i, m_iNumOfElements / i);
-//			if (solveRec(0, 0, table) == 0)
-//				return table;
 		}
 
 		//wait for last threads to finish too
@@ -338,13 +361,11 @@ Table Puzzle::Solve(int numThreads)
 			if (table.isSolved())
 				return table;
 		}
-
-		//empty table, failed to find solution in all threads
-		return Table();
 	}
 	
 	*fout << "Cannot solve puzzle : it seems that there is no proper solution" << endl;
-	
+
+	//empty table, failed to find solution in all threads
 	return Table();
 }
 

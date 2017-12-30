@@ -9,24 +9,25 @@ class Puzzle;
 
 class Table
 {
-	const unsigned int m_iRows;
-	const unsigned int m_iCols;
+	int m_iRows;
+	int m_iCols;
 	int** m_iTable;
 	bool m_bSolved;
 
 public:
-	Table(unsigned int rows=0, unsigned int cols=0);
+	Table(unsigned int rows=0, unsigned int cols=0, bool solved=false);
 	~Table();
 	Table(const Table&);
-	Table& operator=(const Table&) = delete;
+	Table& operator=(const Table&);
 
-	int getRows() { return m_iRows; }
-	int getCols() { return m_iCols; }
+	int getRows()const { return m_iRows; }
+	int getCols()const { return m_iCols; }
 	int getSize() { return m_iRows * m_iCols; }
 	int** getTable() {return m_iTable; }
 	virtual void print(std::ofstream& fout, Puzzle* puz);
 	void setSolved() { m_bSolved = true; }
 	bool isSolved() { return m_bSolved; }
+	bool isEmpty() { return m_iTable == NULL; }
 };
 
 

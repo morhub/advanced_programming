@@ -15,6 +15,10 @@ using namespace std;
 
 class Table;
 
+//static global variable that should signal all threads that
+//someone has got a solution to the problem and they can close themselves
+static bool winner = false;
+
 class Puzzle
 {
 protected:
@@ -75,6 +79,7 @@ private:
 	/*
 	 * internal recursive call from Solve()
 	 */
+	Table Puzzle::solveThread(int rows);
 	int solveRec(size_t i, size_t j, Table& tab);
 
 	/* Assuming that all "middle" parts are equaly distributed with 1,0,-1 edges,
