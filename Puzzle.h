@@ -23,7 +23,7 @@ class Puzzle
 {
 protected:
 	vector<Part> m_vParts;
-	map<pair<int, int>, list<pair<list<Part>*, list<int>>>> m_mMatches;
+	map<pair<int, int>, list<pair<list<Part*>*, list<int>>>> m_mMatches;
 	size_t m_iNumOfElements;
 	ofstream* fout;
 
@@ -73,7 +73,7 @@ public:
 	 * to make better use of puzzle different solution modes (rotate/non-rotate mode)
 	 */
 	virtual void initPartsMap() = 0;
-	virtual list<pair<list<Part>*, list<int>>> getMatches(int left, int top, int right, int bottom) = 0;
+	virtual list<pair<list<Part*>*, list<int>>> getMatches(int left, int top, int right, int bottom) = 0;
 
 private:
 	/*

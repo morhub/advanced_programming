@@ -179,7 +179,7 @@ int Puzzle::init(std::string path)
 int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 {
 	int** table = tab.getTable();
-	list<pair<list<Part>*, list<int>>> matches;
+	list<pair<list<Part*>*, list<int>>> matches;
 
 	int leftpeek, toppeek, rightpeek, bottompeek;
 	rightpeek = bottompeek = -2; //there is no part to the right/bottom
@@ -213,7 +213,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 	//solve the puzzle from top-left to bottom-right
 	for (auto& match : matches)
 	{
-		list<Part>* matchlist = match.first;
+		list<Part*>* matchlist = match.first;
 		list<int> rotations = match.second;
 
 		//no parts of this left-top edges are avilable
@@ -221,12 +221,12 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 			continue;
 
 		//if we got so far, we have match in this list - continue checking this part
-		Part& current = matchlist->front();
+		Part* current = matchlist->front();
 		matchlist->pop_front();
-		table[i][j] = current.getId();
+		table[i][j] = current->getId();
 		for (auto& rotation : rotations)
 		{
-			current.addRotation(rotation);
+			current->addRotation(rotation);
 			//End of table
 			if ((i == (size_t)tab.getRows() - 1) && (j == (size_t)tab.getCols() - 1))
 				return 0; //solve succeeded
@@ -238,7 +238,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 					return 0;
 				else
 				{
-					current.addRotation(-rotation);
+					current->addRotation(-rotation);
 					continue;
 				}
 			}
@@ -248,7 +248,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab)
 					return 0;
 				else
 				{
-					current.addRotation(-rotation);
+					current->addRotation(-rotation);
 					continue;
 				}
 			}
@@ -302,7 +302,7 @@ Table Puzzle::solveThread(const int rows)
 	if(Puzzle::solveRec(0, 0, table) == 0)
 		table.setSolved();
 	printf("finished thread of rows %d, solved: %d\n", rows, table.isSolved());
-	Sleep(5000);
+	//Sleep(5000);
 	return table;
 }
 
@@ -313,10 +313,10 @@ Table Puzzle::Solve(int numThreads)
 	vector<std::future<Table>> threads;
 
 	vector<int> possibleRows = getMostProbableRowSizes();
-	if (!numThreads) {
+	if (numThreads == 0) {
 		for (const auto& i : possibleRows) {
 			Table table(i, m_iNumOfElements / i);
-			if (solveRec(0, 0, table) == 0)
+			if (solveRec(0, 0, table) == 0) //add parameter m_map 
 				return table;
 		}
 	}

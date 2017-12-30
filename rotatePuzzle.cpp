@@ -18,7 +18,7 @@ rotatePuzzle::rotatePuzzle()
 	{
 		for (int j = -1; j < 2; j++)
 		{
-			m_mPartMap[make_pair(i, j)] = *(new list<pair<list<Part>*, list<int>>>());	
+			m_mPartMap[make_pair(i, j)] = *(new list<pair<list<Part*>*, list<int>>>());	
 		}
 	}
 }
@@ -64,10 +64,10 @@ void rotatePuzzle::initPartsMap()
 	bool foundAList = false;
 
 	//from m_vParts to list(list(part))
-	list<list<Part>*> templist;
+	list<list<Part*>*> templist;
 
 	//first part - new list 
-	templist.emplace_back(new list<Part>{m_vParts.at(0)});
+	templist.emplace_back(new list<Part*>{&(m_vParts.at(0))});
 
 	for (int i = 1; i < getNumOfElements(); i++)
 	{
@@ -76,20 +76,20 @@ void rotatePuzzle::initPartsMap()
 		for (auto& partList : templist) 
 		{
 			//this is a list<Part>
-			list<int> rotate = m_vParts.at(i).getPermutations(partList->front());
+			list<int> rotate = m_vParts.at(i).getPermutations(*(partList->front()));
 			if (!rotate.empty()) //there is a permotation
 			{
 				//in that case it's a real part, meaning right&bottom != -2.
 				// and so its not a special case=> there is only 1 rotation angle
 				m_vParts.at(i).setRotation(rotate.front());
-				partList->emplace_back(m_vParts.at(i));
+				partList->emplace_back(&(m_vParts.at(i)));
 				foundAList = true;
 				break; //move to the next part
 			}
 		}
 		//didnt find a list for this part- create new one 
 		if (!foundAList)
-			templist.emplace_back(new list<Part>{m_vParts.at(i)});
+			templist.emplace_back(new list<Part*>{&(m_vParts.at(i))});
 	}
 
 	//init the map member : 
@@ -99,7 +99,7 @@ void rotatePuzzle::initPartsMap()
 		{
 			for (auto& partList : templist)
 			{
-				list<int> rotates = partList->front().getPermutations(left, top, -2, -2);
+				list<int> rotates = partList->front()->getPermutations(left, top, -2, -2);
 				if (rotates.empty()) //this list doesnt match to these left, top
 					continue;
 				else
@@ -113,9 +113,9 @@ void rotatePuzzle::initPartsMap()
 }
 
 
-list<pair<list<Part>*, list<int>>> rotatePuzzle::getMatches(int left, int top, int right, int bottom)
+list<pair<list<Part*>*, list<int>>> rotatePuzzle::getMatches(int left, int top, int right, int bottom)
 {
-	list<pair<list<Part>*, list<int>>> retlist = m_mPartMap[make_pair(left, top)];
+	list<pair<list<Part*>*, list<int>>> retlist = m_mPartMap[make_pair(left, top)];
 	if (retlist.empty())
 		return retlist;
 
@@ -124,13 +124,13 @@ list<pair<list<Part>*, list<int>>> rotatePuzzle::getMatches(int left, int top, i
 		
 		if (element.first->empty())
 			continue;
-		element.second = element.first->front().getPermutations(left, top, right, bottom);
+		element.second = element.first->front()->getPermutations(left, top, right, bottom);
 	}
 	
 
 	retlist.erase(std::remove_if(retlist.begin(), retlist.end(),
-		[left, top, right, bottom](pair<list<Part>*, list<int>> value) {
-		list<Part>* partList = value.first;
+		[left, top, right, bottom](pair<list<Part*>*, list<int>> value) {
+		list<Part*>* partList = value.first;
 		if (partList->empty())
 			return true;
 

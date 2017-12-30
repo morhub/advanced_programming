@@ -16,7 +16,7 @@ using namespace std;
 
 class nonRotatePuzzle : public Puzzle
 {
-	map<pair<int, int>, map<pair<int, int>, list<Part>*>> m_mPartMap;
+	map<pair<int, int>, map<pair<int, int>, list<Part*>*>> m_mPartMap;
 
 public:
 	nonRotatePuzzle();
@@ -45,7 +45,7 @@ public:
 
 	virtual bool isValidStraightEdges(int sizei, int sizej);
 	virtual bool cornerCheck(bool &tr, bool &tl, bool &br, bool &bl);
-	virtual list<pair<list<Part>*, list<int>>> getMatches(int left, int top, int right, int bottom);
+	virtual list<pair<list<Part*>*, list<int>>> getMatches(int left, int top, int right, int bottom);
 };
 
 #endif
