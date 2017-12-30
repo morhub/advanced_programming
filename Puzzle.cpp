@@ -7,6 +7,10 @@
 #include "Puzzle.h"
 #include <algorithm>
 #include <memory>
+#include <chrono>
+#include <ctime>
+#include <future>
+#include <thread>
 
 using std::getline;
 using std::string;
@@ -284,15 +288,59 @@ vector<int> Puzzle::getMostProbableRowSizes()
 	return sizes;
 }
 
-Table Puzzle::Solve()
+Table Puzzle::Solve(int numThreads)
 {
 	preComputeCommonCase();
+	std::chrono::milliseconds span(10);
+	vector<std::future<Table>> threads;
+	//std::future<Table> *thread;
 
 	vector<int> possibleRows = getMostProbableRowSizes();
-	for(const auto& i : possibleRows) {
-		Table table(i, m_iNumOfElements/i); 
-		if (solveRec(0, 0, table) == 0)
-			return table;
+	if (!numThreads) {
+		for (const auto& i : possibleRows) {
+			Table table(i, m_iNumOfElements / i);
+			if (solveRec(0, 0, table) == 0)
+				return table;
+		}
+	}
+	else {
+		for (const auto& i : possibleRows) {
+			if (numThreads > 0) {
+				std::future<Table> thread = std::async(Puzzle::solveThread, i);
+				threads.push_back(thread);
+				numThreads--;
+			} else {
+				for (int j; j < threads.size(); (j++) % threads.size()) {
+					if (threads[j].wait_for(span) != std::future_status::timeout) {
+						Table& table = threads[j].get();
+						if (table.isSolved()) {
+							for (auto& thread : threads)
+								thread.wait();
+							return table;
+						}
+						else {
+							threads[j] = std::async(Puzzle::solveThread, i);
+						}
+					}
+				}
+			}
+//			Table table(i, m_iNumOfElements / i);
+//			if (solveRec(0, 0, table) == 0)
+//				return table;
+		}
+
+		//wait for last threads to finish too
+		for (auto& thread : threads)
+			thread.wait();
+
+		for (auto& thread : threads) {
+			Table& table = thread.get();
+			if (table.isSolved())
+				return table;
+		}
+
+		//empty table, failed to find solution in all threads
+		return Table();
 	}
 	
 	*fout << "Cannot solve puzzle : it seems that there is no proper solution" << endl;

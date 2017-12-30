@@ -40,10 +40,11 @@ public:
 	 * Solves a puzzle, basically sets each part's
 	 * (row, col) to its relevant position on table
 	 *
+	 * @param threads
 	 * @return solution organized in table on success,
 	 *  empty table on failure.
 	 */
-	Table Solve();
+	Table Solve(int threads);
 
 	/*Checking 3 possible problems that end the game.. 
 	* 1- Have we got 4 corners?

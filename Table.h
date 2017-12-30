@@ -12,6 +12,7 @@ class Table
 	const unsigned int m_iRows;
 	const unsigned int m_iCols;
 	int** m_iTable;
+	bool m_bSolved;
 
 public:
 	Table(unsigned int rows=0, unsigned int cols=0);
@@ -24,6 +25,8 @@ public:
 	int getSize() { return m_iRows * m_iCols; }
 	int** getTable() {return m_iTable; }
 	virtual void print(std::ofstream& fout, Puzzle* puz);
+	void setSolved() { m_bSolved = true; }
+	bool isSolved() { return m_bSolved; }
 };
 
 

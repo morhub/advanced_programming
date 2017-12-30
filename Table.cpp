@@ -9,7 +9,8 @@ using namespace std;
 
 Table::Table(unsigned int rows, unsigned int cols):
 	m_iRows(rows),
-	m_iCols(cols)
+	m_iCols(cols),
+	m_bSolved(false)
 {
 	unsigned int i;
 
