@@ -34,8 +34,8 @@ private:
 	*/
 	partMapRotate_t setPartsMap(vector<Part>& parts);
 
-	void preComputeCommonCase(partMapRotate_t& partMap, common_match_t& cm);
-	void preComputeFullCase(partMapRotate_t& partMap, full_match_t& fm);
+	void ComputeCommonDataBase(partMapRotate_t& partMap, common_match_t& cm);
+	void ComputeFullDataBase(partMapRotate_t& partMap, full_match_t& fm);
 	void initiatePartMap(partMapRotate_t& pmap);
 	
 	virtual int getMaxPossibleRows() { return (int)sqrt(m_iNumOfElements); }

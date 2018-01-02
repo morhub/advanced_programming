@@ -23,8 +23,6 @@ class Puzzle
 {
 protected:
 	vector<Part> m_vParts;
-	//map<pair<int, int>, list<pair<list<Part*>*, list<int>>>> m_mCommonMatches;
-	//map<tuple<int, int, int, int>, list<pair<list<Part*>*, list<int>>>> m_mFullMatches;
 	size_t m_iNumOfElements;
 	ofstream* fout;
 
@@ -96,8 +94,6 @@ private:
 	*/
 	void Puzzle::updatePointersPerThread(common_match_t& cm, full_match_t& fm, vector<Part>& vPartsCopy);
 
-	void copyAndUpdateCommonMatch(vector<Part>& vPartsCopy, common_match_t& cm);
-	void copyAndUpdateFullMatch(vector<Part>& vPartsCopy, full_match_t& fm);
 };
 
 

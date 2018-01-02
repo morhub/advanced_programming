@@ -264,7 +264,7 @@ list<pair<list<Part*>*, list<int>>> nonRotatePuzzle::getMatches(int left, int to
 	return retlist;
 }
 
-void nonRotatePuzzle::preComputeCommonCase(partMapNonRotate_t& partMap, common_match_t& cm)
+void nonRotatePuzzle::ComputeCommonDataBase(partMapNonRotate_t& partMap, common_match_t& cm)
 {
 	//pre-compute the common case (no right,bottom edges)
 	for (int i = -1; i < 2; i++)
@@ -273,7 +273,7 @@ void nonRotatePuzzle::preComputeCommonCase(partMapNonRotate_t& partMap, common_m
 }
 
 
-void nonRotatePuzzle::preComputeFullCase(partMapNonRotate_t& partMap, full_match_t& fm)
+void nonRotatePuzzle::ComputeFullDataBase(partMapNonRotate_t& partMap, full_match_t& fm)
 {
 	//pre-compute the full case (no right,bottom edges)
 		for (int i = -2; i < 2; i++)
@@ -287,6 +287,6 @@ void nonRotatePuzzle::preComputeFullCase(partMapNonRotate_t& partMap, full_match
 void nonRotatePuzzle::createDataBase(vector<Part>& parts, common_match_t& cm, full_match_t& fm)
 {
 	auto partMap = setPartsMap(parts);
-	preComputeCommonCase(partMap, cm);
-	preComputeFullCase(partMap, fm);
+	ComputeCommonDataBase(partMap, cm);
+	ComputeFullDataBase(partMap, fm);
 }

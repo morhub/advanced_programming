@@ -35,8 +35,8 @@ public:
 	virtual void createDataBase(vector<Part>& parts, common_match_t& cm, full_match_t& fm);
 
 private:
-	void preComputeCommonCase(partMapNonRotate_t& partMap, common_match_t& cm);
-	void preComputeFullCase(partMapNonRotate_t& partMap, full_match_t& fm);
+	void ComputeCommonDataBase(partMapNonRotate_t& partMap, common_match_t& cm);
+	void ComputeFullDataBase(partMapNonRotate_t& partMap, full_match_t& fm);
 	void initiatePartMap(partMapNonRotate_t& pmap);
 
 	virtual bool isValidStraightEdges(int sizei, int sizej);

@@ -362,50 +362,6 @@ void Puzzle::updatePointersPerThread(common_match_t& cm, full_match_t& fm, vecto
 		}
 	}
 }
-
-
-void Puzzle::copyAndUpdateCommonMatch(vector<Part>& vPartsCopy, common_match_t& cm)
-{
-	for (int i = -1; i < 2; i++)
-	{
-		for (int j = -1; j < 2; j++)
-		{
-			//ret[make_pair(i, j)] = m_mCommonMatches[make_pair(i,j)];
-			//list<pair<list<Part*>*, list<int>>>& copylist = cm[make_pair(i, j)];
-			for (pair<list<Part*>*, list<int>>& match : cm[make_pair(i, j)])
-			{
-				list<Part*>* orig_list = match.first;
-				match.first = new list<Part*>();
-				for (Part* p : *orig_list)
-					match.first->push_back(&vPartsCopy.at(p->getId() - 1));
-			}
-		}
-	}
-}
-
-
-void Puzzle::copyAndUpdateFullMatch(vector<Part>& vPartsCopy, full_match_t& fm)
-{
-	for (int i = -2; i < 2; i++)
-	{
-		for (int j = -2; j < 2; j++)
-		{
-			for (int k = -2; k < 2; k++)
-			{
-				for (int l = -2; l < 2; l++)
-				{
-					for (pair<list<Part*>*, list<int>>& match : fm[make_tuple(i, j, k, l)])
-					{
-						list<Part*>* orig_list = match.first;
-						match.first = new list<Part*>();
-						for (Part* p : *orig_list)
-							match.first->push_back(&vPartsCopy.at(p->getId() - 1));
-					}
-				}
-			}
-		}
-	}
-}
 		
 
 Table Puzzle::solveThread(const int rows)

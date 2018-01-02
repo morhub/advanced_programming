@@ -138,7 +138,7 @@ list<pair<list<Part*>*, list<int>>> rotatePuzzle::getMatches(int left, int top, 
 
 
 
-void rotatePuzzle::preComputeCommonCase(partMapRotate_t& partMap, common_match_t& cm)
+void rotatePuzzle::ComputeCommonDataBase(partMapRotate_t& partMap, common_match_t& cm)
 {
 	//pre-compute the common case (no right,bottom edges)
 	for (int i = -1; i < 2; i++)
@@ -147,7 +147,7 @@ void rotatePuzzle::preComputeCommonCase(partMapRotate_t& partMap, common_match_t
 }
 
 
-void rotatePuzzle::preComputeFullCase(partMapRotate_t& partMap, full_match_t& fm)
+void rotatePuzzle::ComputeFullDataBase(partMapRotate_t& partMap, full_match_t& fm)
 {
 	//pre-compute the full case (no right,bottom edges)
 	for (int i = -2; i < 2; i++)
@@ -161,6 +161,6 @@ void rotatePuzzle::preComputeFullCase(partMapRotate_t& partMap, full_match_t& fm
 void rotatePuzzle::createDataBase(vector<Part>& parts, common_match_t& cm, full_match_t& fm)
 {
 	auto partMap = setPartsMap(parts);
-	preComputeCommonCase(partMap, cm);
-	preComputeFullCase(partMap, fm);
+	ComputeCommonDataBase(partMap, cm);
+	ComputeFullDataBase(partMap, fm);
 }
