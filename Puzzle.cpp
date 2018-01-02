@@ -222,20 +222,6 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab, common_match_t& cm, full_ma
 	else
 		matches = fm[make_tuple(leftpeek, toppeek, rightpeek, bottompeek)];
 
-	if (i == 0 && (j == 1||j==0))
-	{
-		for (auto ma : matches)
-		{
-			printf("matches for %d,%d: ", i, j);
-			for (auto p : *ma.first)
-			{
-				printf("%d, ", p->getId());
-			}
-			printf("\n");
-		}
-	}
-
-
 	//We always check the top-left directions - 
 	//solve the puzzle from top-left to bottom-right
 	for (auto& match : matches)
@@ -431,21 +417,12 @@ Table Puzzle::solveThread(const int rows)
 
 	Table table(rows, m_iNumOfElements / rows);
 	auto vPartsCopy = m_vParts;
-	//for (auto& p : m_vParts)
-	//{
-	//	p.setId(-1);
-	//}
-	common_match_t commonMatches	=  m_mCommonMatches;
-	full_match_t   fullMatches		=  m_mFullMatches;
 
-	copyAndUpdateCommonMatch(vPartsCopy, commonMatches);
-	copyAndUpdateFullMatch(vPartsCopy, fullMatches);
-	
-	//updatePointersPerThread(cm, fm, vPartsCopy);
-	
-	printf("before solveRec\n");
+	common_match_t cm;
+	full_match_t fm;
+	createDataBase(vPartsCopy, cm, fm);
 
-	if (Puzzle::solveRec(0, 0, table, commonMatches, fullMatches, vPartsCopy) == 0) {
+	if (Puzzle::solveRec(0, 0, table, cm, fm, vPartsCopy) == 0) {
 		print_mutex.lock();
 		printf("thread of rows %d: setSolved\n", rows);
 		print_mutex.unlock();
@@ -453,7 +430,6 @@ Table Puzzle::solveThread(const int rows)
 		table.setSolved();
 		//winner = true;
 
-		printf("table[0][0]: %d, table[0][1]: %d\n", table.getTable()[0][0], table.getTable()[0][1]);
 		m_vParts = vPartsCopy; //the chosen one
 	}
 	
@@ -467,16 +443,19 @@ Table Puzzle::solveThread(const int rows)
 
 Table Puzzle::Solve(int numThreads)
 {
-	preComputeCommonCase();
-	preComputeFullCase();
+	
 	std::chrono::milliseconds span(10);
 	vector<std::future<Table>> threads;
 
 	vector<int> possibleRows = getMostProbableRowSizes();
 	if (numThreads == 0) {
+		common_match_t cm;
+		full_match_t fm;
+		createDataBase(m_vParts, cm, fm);
+
 		for (const auto& i : possibleRows) {
 			Table table(i, m_iNumOfElements / i);
-			if (solveRec(0, 0, table, m_mCommonMatches, m_mFullMatches, m_vParts) == 0) 
+			if (solveRec(0, 0, table, cm, fm, m_vParts) == 0) 
 				return table;
 		}
 	}
@@ -609,21 +588,5 @@ int Puzzle::preProcess()
 	return ret;
 }
 
-void Puzzle::preComputeCommonCase()
-{
-	//pre-compute the common case (no right,bottom edges)
-	for (int i = -1; i < 2; i++)
-		for (int j = -1; j < 2; j++)
-			m_mCommonMatches[make_pair(i, j)] = getMatches(i, j, -2, -2);
-}
 
 
-void Puzzle::preComputeFullCase()
-{
-	//pre-compute the full case (no right,bottom edges)
-	for (int i = -2; i < 2; i++)
-		for (int j = -2; j < 2; j++)
-			for (int k = -2; k < 2; k++)
-				for (int l = -2; l < 2; l++)
-					m_mFullMatches[make_tuple(i, j, k, l)] = getMatches(i, j, k, l);
-}

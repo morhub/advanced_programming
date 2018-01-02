@@ -23,8 +23,8 @@ class Puzzle
 {
 protected:
 	vector<Part> m_vParts;
-	map<pair<int, int>, list<pair<list<Part*>*, list<int>>>> m_mCommonMatches;
-	map<tuple<int, int, int, int>, list<pair<list<Part*>*, list<int>>>> m_mFullMatches;
+	//map<pair<int, int>, list<pair<list<Part*>*, list<int>>>> m_mCommonMatches;
+	//map<tuple<int, int, int, int>, list<pair<list<Part*>*, list<int>>>> m_mFullMatches;
 	size_t m_iNumOfElements;
 	ofstream* fout;
 
@@ -73,8 +73,7 @@ public:
 	 * Creates a more suitable data structure from the part list,
 	 * to make better use of puzzle different solution modes (rotate/non-rotate mode)
 	 */
-	virtual void initPartsMap() = 0;
-	virtual list<pair<list<Part*>*, list<int>>> getMatches(int left, int top, int right, int bottom) = 0;
+	virtual void createDataBase(vector<Part>& parts, common_match_t& cm, full_match_t& fm) = 0;
 
 private:
 	/*
@@ -99,10 +98,6 @@ private:
 
 	void copyAndUpdateCommonMatch(vector<Part>& vPartsCopy, common_match_t& cm);
 	void copyAndUpdateFullMatch(vector<Part>& vPartsCopy, full_match_t& fm);
-
-protected:
-	void preComputeCommonCase();
-	void preComputeFullCase();
 };
 
 

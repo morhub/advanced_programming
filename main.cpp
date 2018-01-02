@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 	bool rotate;
 	Puzzle* puz;
 	string Rotate = "-rotate";
-	int threads = 1;
+	int threads = 3;
 
 	switch (argc) {
 	case 3:
@@ -71,13 +71,13 @@ int main(int argc, char *argv[])
 		return rc;
 	}
 
-	puz->initPartsMap();
+	//puz->initPartsMap();
 
 	Table table = puz->Solve(threads);
-	//if (table.getTable())
-	//	table.print(output, puz);
-	//else
-	//	rc = -1;
+	if (table.getTable())
+		table.print(output, puz);
+	else
+		rc = -1;
 	
 	return rc;
 }

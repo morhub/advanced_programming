@@ -12,7 +12,7 @@ using std::endl;
 using std::pair;
 
 
-nonRotatePuzzle::nonRotatePuzzle()
+void nonRotatePuzzle::initiatePartMap(partMapNonRotate_t& pmap)
 {
 	for (int i = -1; i < 2; i++)
 	{
@@ -22,24 +22,7 @@ nonRotatePuzzle::nonRotatePuzzle()
 			{
 				for (int s = -1; s < 2; s++)
 				{
-					m_mPartMap[make_pair(i, j)][make_pair(k, s)] = new list<Part*>();
-				}
-			}
-		}
-	}
-}
-
-nonRotatePuzzle::~nonRotatePuzzle()
-{
-	for (int i = -1; i < 2; i++)
-	{
-		for (int j = -1; j < 2; j++)
-		{
-			for (int k = -1; k < 2; k++)
-			{
-				for (int s = -1; s < 2; s++)
-				{
-					delete m_mPartMap[make_pair(i, j)][make_pair(k, s)];
+					pmap[make_pair(i, j)][make_pair(k, s)] = new list<Part*>();
 				}
 			}
 		}
@@ -47,19 +30,24 @@ nonRotatePuzzle::~nonRotatePuzzle()
 }
 
 
-void nonRotatePuzzle::initPartsMap()
+partMapNonRotate_t nonRotatePuzzle::setPartsMap(vector<Part>& parts)
 {
 	int l, t, r, b;
+	partMapNonRotate_t retMap;
+	initiatePartMap(retMap);
+
 	for (size_t i = 0; i < m_iNumOfElements; i++)
 	{
-		Part& p = m_vParts.at(i);
+		Part& p = parts.at(i);
 		l = p.getLeft();
 		t = p.getTop();
 		r = p.getRight();
 		b = p.getBottom();
 
-		m_mPartMap[make_pair(l, t)][make_pair(r, b)]->push_back(&p);
+		retMap[make_pair(l, t)][make_pair(r, b)]->push_back(&p);
 	}
+
+	return retMap;
 }
 
 
@@ -239,10 +227,10 @@ bool nonRotatePuzzle::cornerCheck(bool &tr, bool &tl, bool &br, bool &bl)
 	return false;
 }
 
-list<pair<list<Part*>*, list<int>>> nonRotatePuzzle::getMatches(int left, int top, int right, int bottom)
+list<pair<list<Part*>*, list<int>>> nonRotatePuzzle::getMatches(int left, int top, int right, int bottom, partMapNonRotate_t& partMap)
 {
 	list<pair<list<Part*>*, list<int>>> retlist;
-	const auto& MatchMap = m_mPartMap[make_pair(left, top)];
+	const auto& MatchMap = partMap[make_pair(left, top)];
 
 	/* transform "map<pair<int, int>, list<Part>*>" into "list<pair<list<Part>*, int>>".
 	 * the "0" stands for zero rotation, since no rotation are allowed in this scenario */
@@ -274,4 +262,31 @@ list<pair<list<Part*>*, list<int>>> nonRotatePuzzle::getMatches(int left, int to
 	);
 
 	return retlist;
+}
+
+void nonRotatePuzzle::preComputeCommonCase(partMapNonRotate_t& partMap, common_match_t& cm)
+{
+	//pre-compute the common case (no right,bottom edges)
+	for (int i = -1; i < 2; i++)
+		for (int j = -1; j < 2; j++)
+			cm[make_pair(i, j)] = getMatches(i, j, -2, -2, partMap);
+}
+
+
+void nonRotatePuzzle::preComputeFullCase(partMapNonRotate_t& partMap, full_match_t& fm)
+{
+	//pre-compute the full case (no right,bottom edges)
+		for (int i = -2; i < 2; i++)
+			for (int j = -2; j < 2; j++)
+				for (int k = -2; k < 2; k++)
+					for (int l = -2; l < 2; l++)
+						fm[make_tuple(i, j, k, l)] = getMatches(i, j, k, l, partMap);
+}
+
+
+void nonRotatePuzzle::createDataBase(vector<Part>& parts, common_match_t& cm, full_match_t& fm)
+{
+	auto partMap = setPartsMap(parts);
+	preComputeCommonCase(partMap, cm);
+	preComputeFullCase(partMap, fm);
 }
