@@ -23,6 +23,11 @@ using std::lock;
 
 static std::mutex print_mutex;
 
+//static global variable that should signal all threads that
+//someone has got a solution to the problem and they can close themselves
+static bool winner = false;
+
+
 Table foo(int i) {
 	return Table();
 }
@@ -180,8 +185,12 @@ int Puzzle::init(std::string path)
 }
 
 
-int Puzzle::solveRec(size_t i, size_t j, Table& tab, common_match_t& cm, full_match_t& fm)
+int Puzzle::solveRec(size_t i, size_t j, Table& tab, common_match_t& cm, full_match_t& fm, vector<Part>& vParts)
 {
+	if (winner) //another thread already won, this thread need to finish
+		return -1;
+
+	
 	int** table = tab.getTable();
 	list<pair<list<Part*>*, list<int>>> matches;
 
@@ -191,13 +200,13 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab, common_match_t& cm, full_ma
 
 	if (j > 0 && table[i][j - 1] >= 0)
 	{
-		int angle = (m_vParts)[table[i][j - 1] - 1].getRotation();
-		leftpeek = 0 - ((m_vParts)[table[i][j - 1] - 1].getRightAfterRotate(angle));
+		int angle = (vParts)[table[i][j - 1] - 1].getRotation();
+		leftpeek = 0 - ((vParts)[table[i][j - 1] - 1].getRightAfterRotate(angle));
 	}
 	if (i > 0 && table[i - 1][j] >= 0)
 	{
-		int angle = (m_vParts)[table[i - 1][j] - 1].getRotation();
-		toppeek = 0 - ((m_vParts)[table[i - 1][j] - 1].getBottomAfterRotate(angle));
+		int angle = (vParts)[table[i - 1][j] - 1].getRotation();
+		toppeek = 0 - ((vParts)[table[i - 1][j] - 1].getBottomAfterRotate(angle));
 	}
 	if(j == (size_t)tab.getCols() - 1)   //last in line (e.g. frame part)
 		rightpeek = 0;
@@ -212,6 +221,20 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab, common_match_t& cm, full_ma
 		matches = cm[make_pair(leftpeek, toppeek)];
 	else
 		matches = fm[make_tuple(leftpeek, toppeek, rightpeek, bottompeek)];
+
+	if (i == 0 && (j == 1||j==0))
+	{
+		for (auto ma : matches)
+		{
+			printf("matches for %d,%d: ", i, j);
+			for (auto p : *ma.first)
+			{
+				printf("%d, ", p->getId());
+			}
+			printf("\n");
+		}
+	}
+
 
 	//We always check the top-left directions - 
 	//solve the puzzle from top-left to bottom-right
@@ -233,12 +256,15 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab, common_match_t& cm, full_ma
 			current->addRotation(rotation);
 			//End of table
 			if ((i == (size_t)tab.getRows() - 1) && (j == (size_t)tab.getCols() - 1))
+			{
+				winner = true;
 				return 0; //solve succeeded
+			}
 
 			//End of line
 			if (j == (size_t)tab.getCols() - 1)
 			{
-				if (solveRec(i + 1, 0, tab, cm, fm) == 0) //move to the next line, and first column
+				if (solveRec(i + 1, 0, tab, cm, fm, vParts) == 0) //move to the next line, and first column
 					return 0;
 				else
 				{
@@ -248,7 +274,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab, common_match_t& cm, full_ma
 			}
 			else // "middle" cell in line
 			{
-				if (solveRec(i, j + 1, tab, cm, fm) == 0) //continue solving along the current line
+				if (solveRec(i, j + 1, tab, cm, fm, vParts) == 0) //continue solving along the current line
 					return 0;
 				else
 				{
@@ -259,6 +285,7 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab, common_match_t& cm, full_ma
 		}
 		table[i][j] = 0;
 		matchlist->push_back(current);
+
 	}
 	return -1;
 }
@@ -404,22 +431,29 @@ Table Puzzle::solveThread(const int rows)
 
 	Table table(rows, m_iNumOfElements / rows);
 	auto vPartsCopy = m_vParts;
-	common_match_t cm =  m_mCommonMatches;//copyAndUpdateCommonMatch(vPartsCopy);//
-	full_match_t fm =  m_mFullMatches;//copyAndUpdateFullMatch(vPartsCopy);//
+	//for (auto& p : m_vParts)
+	//{
+	//	p.setId(-1);
+	//}
+	common_match_t commonMatches	=  m_mCommonMatches;
+	full_match_t   fullMatches		=  m_mFullMatches;
 
-	copyAndUpdateCommonMatch(vPartsCopy, cm);
-	copyAndUpdateFullMatch(vPartsCopy, fm);
+	copyAndUpdateCommonMatch(vPartsCopy, commonMatches);
+	copyAndUpdateFullMatch(vPartsCopy, fullMatches);
 	
 	//updatePointersPerThread(cm, fm, vPartsCopy);
 	
 	printf("before solveRec\n");
 
-	if (Puzzle::solveRec(0, 0, table, cm, fm) == 0) {
+	if (Puzzle::solveRec(0, 0, table, commonMatches, fullMatches, vPartsCopy) == 0) {
 		print_mutex.lock();
 		printf("thread of rows %d: setSolved\n", rows);
 		print_mutex.unlock();
 
 		table.setSolved();
+		//winner = true;
+
+		printf("table[0][0]: %d, table[0][1]: %d\n", table.getTable()[0][0], table.getTable()[0][1]);
 		m_vParts = vPartsCopy; //the chosen one
 	}
 	
@@ -442,7 +476,7 @@ Table Puzzle::Solve(int numThreads)
 	if (numThreads == 0) {
 		for (const auto& i : possibleRows) {
 			Table table(i, m_iNumOfElements / i);
-			if (solveRec(0, 0, table, m_mCommonMatches, m_mFullMatches) == 0) 
+			if (solveRec(0, 0, table, m_mCommonMatches, m_mFullMatches, m_vParts) == 0) 
 				return table;
 		}
 	}
@@ -456,11 +490,11 @@ Table Puzzle::Solve(int numThreads)
 			if (numThreads > 0) {
 				
 				print_mutex.lock();
-				printf("start new thread of rows %d\n", i);
+				printf("add new thread of rows %d\n", i);
 				print_mutex.unlock();
-				
 				threads.push_back(std::async(std::launch::async, &Puzzle::solveThread, this, i));
 				numThreads--;
+
 			} else {
 				
 				print_mutex.lock();
@@ -469,16 +503,16 @@ Table Puzzle::Solve(int numThreads)
 				
 				for (int j = 0; j < (int)threads.size(); j = (j+1) % threads.size())
 				{
-					print_mutex.lock();
-					printf("Wait for thread num %d\n", j);
-					print_mutex.unlock();
+					//print_mutex.lock();
+					//printf("Wait for thread num %d\n", j);
+					//print_mutex.unlock();
 					
 					if (threads[j].wait_for(span) != std::future_status::timeout) {
 						print_mutex.lock();
 						printf("thread %d finished\n", j);
 						print_mutex.unlock();
 						
-						Table& table = threads[j].get();
+						Table table = threads[j].get();
 						
 						if (table.isSolved()) {
 							print_mutex.lock();
@@ -497,15 +531,23 @@ Table Puzzle::Solve(int numThreads)
 						else {
 							print_mutex.lock();
 							printf("thread %d didn't solve...\n", j);
-							printf("start new thread of rows %d\n", i);
 							print_mutex.unlock();
+
+							if (!winner)
+							{
+								print_mutex.lock();
+								printf("fill array new thread of rows %d\n", i);
+								print_mutex.unlock();
 							
-							threads[j] = std::async(std::launch::async, &Puzzle::solveThread, this, i);
+								threads[j] = std::async(std::launch::async, &Puzzle::solveThread, this, i);
+							}
 							break;
 						}
 					}
 				}
 			}
+			if (winner)
+				break;
 		}
 
 		//wait for last threads to finish too

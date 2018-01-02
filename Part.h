@@ -40,6 +40,8 @@ public:
 	int getBottomAfterRotate(int angle);
 	bool isSpecial();
 
+	void setId(int i) { m_iId = i; } ///delete !!!!!!!!!!!!!!!!
+
 	
 
 	/*

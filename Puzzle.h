@@ -18,9 +18,6 @@ class Table;
 typedef map<pair<int, int>, list<pair<list<Part*>*, list<int>>>>			common_match_t;
 typedef map<tuple<int, int, int, int>, list<pair<list<Part*>*, list<int>>>> full_match_t;
 
-//static global variable that should signal all threads that
-//someone has got a solution to the problem and they can close themselves
-static bool winner = false;
 
 class Puzzle
 {
@@ -84,7 +81,7 @@ private:
 	 * internal recursive call from Solve()
 	 */
 	Table Puzzle::solveThread(int rows);
-	int solveRec(size_t i, size_t j, Table& tab, common_match_t& cm,full_match_t& fm);
+	int solveRec(size_t i, size_t j, Table& tab, common_match_t& cm,full_match_t& fm, vector<Part>& vParts);
 
 	/* Assuming that all "middle" parts are equaly distributed with 1,0,-1 edges,
 	 * a difference between number of left and top straight edges will probably come
