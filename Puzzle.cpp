@@ -11,7 +11,6 @@
 #include <ctime>
 #include <future>
 #include <thread>
-#include <windows.h>
 
 
 using std::getline;
@@ -437,7 +436,6 @@ Table Puzzle::solveThread(const int rows)
 	printf("finished thread of rows %d, solved: %d\n", rows, table.isSolved());
 	print_mutex.unlock();
 
-	//Sleep(5000);
 	return table;
 }
 

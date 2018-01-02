@@ -1,15 +1,16 @@
 // advanced_programming.cpp : Defines the entry point for the console application.
 //
 
-#include <fstream>
-#include <string>
-#include <cstring>
-#include <iostream>
 #include "Puzzle.h"
 #include "rotatePuzzle.h"
 #include "nonRotatePuzzle.h"
 #include "Table.h"
+#include "Parser.h"
 
+#include <fstream>
+#include <string>
+#include <cstring>
+#include <iostream>
 
 using std::cout;
 using std::endl;
@@ -17,51 +18,31 @@ using std::endl;
 int main(int argc, char *argv[])
 {
 	int rc = 0;
-	char *input_file, *output_file;
-	bool rotate;
 	Puzzle* puz;
-	string Rotate = "-rotate";
-	int threads = 3;
 
-	switch (argc) {
-	case 3:
-		input_file = argv[1];
-		output_file = argv[2];
-		rotate = false;
-		break;
-	case 4:
-		if (!Rotate.compare(argv[1])) {
-			input_file = argv[2];
-			output_file = argv[3];
-			rotate = true;
-			break;
-		} else if (!Rotate.compare(argv[2])) {
-			input_file = argv[1];
-			output_file = argv[3];
-			rotate = true;
-			break;
-		} else if (!Rotate.compare(argv[3])) {
-			input_file = argv[1];
-			output_file = argv[2];
-			rotate = true;
-			break;
-		} else
-			/* pass through */ 
-	default:
-		cout << "Usage: " << argv[0] << " <input_file> <output_file>" << endl;
+	if (argc < 3)
+	{
+		cout << "Usage: " << argv[0] << " <input_file> <output_file> ";
+		cout << "[-rotate] [-threads %d] " << endl;
 		return -1;
 	}
+	
+	Parser parser(argc, argv);
+	std::ofstream output(parser.getOutputFile());
 
-	std::ofstream output(output_file);
+	printf("num of threads %d\n", parser.getThreads());
+	printf("rotate %d\n", parser.getRotate());
+	printf("input file %s\n", parser.getInputFile().c_str());
+	printf("output file %s\n", parser.getOutputFile().c_str());
 
-	if (rotate)
+	if (parser.getRotate())
 		puz = new rotatePuzzle();
 	else
 		puz = new nonRotatePuzzle();
 
 	puz->setOutputStream(&output);
 
-	rc = puz->init(input_file);
+	rc = puz->init(parser.getInputFile());
 	if (rc) {
 		return rc;
 	}
@@ -71,9 +52,7 @@ int main(int argc, char *argv[])
 		return rc;
 	}
 
-	//puz->initPartsMap();
-
-	Table table = puz->Solve(threads);
+	Table table = puz->Solve(parser.getThreads());
 	if (table.getTable())
 		table.print(output, puz);
 	else
