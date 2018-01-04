@@ -20,6 +20,7 @@ using std::pair;
 using std::mutex;
 using std::lock;
 
+//static std::mutex print_mutex;
 
 //static global variable that should signal all threads that
 //someone has got a solution to the problem and they can close themselves
@@ -183,19 +184,10 @@ int Puzzle::init(std::string path)
 }
 
 
-int Puzzle::solveRec(size_t i, size_t j, Table& tab, common_match_t& cm, full_match_t& fm, vector<Part>& vParts)
+
+void Puzzle::computePeeks(int& leftpeek, int& toppeek, int& rightpeek, int& bottompeek, int**& table, 
+	vector<Part>& vParts, size_t i, size_t j, Table& tab)
 {
-	if (winner) //another thread already won, this thread need to finish
-		return -1;
-
-	
-	int** table = tab.getTable();
-	list<pair<list<Part*>*, list<int>>> matches;
-
-	int leftpeek, toppeek, rightpeek, bottompeek;
-	rightpeek = bottompeek = -2; //there is no part to the right/bottom
-	leftpeek  = toppeek    = 0; //there is a frame part to the left/top
-
 	if (j > 0 && table[i][j - 1] >= 0)
 	{
 		int angle = (vParts)[table[i][j - 1] - 1].getRotation();
@@ -206,10 +198,39 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab, common_match_t& cm, full_ma
 		int angle = (vParts)[table[i - 1][j] - 1].getRotation();
 		toppeek = 0 - ((vParts)[table[i - 1][j] - 1].getBottomAfterRotate(angle));
 	}
-	if(j == (size_t)tab.getCols() - 1)   //last in line (e.g. frame part)
+	
+	if (j == (size_t)tab.getCols() - 1)   //last in line (e.g. frame part)
 		rightpeek = 0;
 	if (i == (size_t)tab.getRows() - 1) //last in col (e.g frame part)
 		bottompeek = 0;
+
+}
+
+bool Puzzle::EndOfTable(size_t i, size_t j, Table& tab)
+{
+	return (i == (size_t)tab.getRows() - 1) && (j == (size_t)tab.getCols() - 1);
+}
+
+
+bool Puzzle::EndOfLine(size_t j, Table& tab)
+{
+	return (j == (size_t)tab.getCols() - 1);
+}
+
+
+int Puzzle::solveRec(size_t i, size_t j, Table& tab, common_match_t& cm, full_match_t& fm, vector<Part>& vParts)
+{
+	if (winner) //another thread already won, this thread need to finish
+		return -1;
+
+	int** table = tab.getTable();
+	list<pair<list<Part*>*, list<int>>> matches;
+
+	int leftpeek, toppeek, rightpeek, bottompeek;
+	rightpeek = bottompeek = -2; //there is no part to the right/bottom
+	leftpeek  = toppeek    = 0; //there is a frame part to the left/top
+
+	computePeeks(leftpeek, toppeek, rightpeek, bottompeek, table, vParts, i, j, tab);
 
 	/*
 	 * We call solveRec a lot of times with the same left, top values,
@@ -238,15 +259,14 @@ int Puzzle::solveRec(size_t i, size_t j, Table& tab, common_match_t& cm, full_ma
 		for (auto& rotation : rotations)
 		{
 			current->addRotation(rotation);
-			//End of table
-			if ((i == (size_t)tab.getRows() - 1) && (j == (size_t)tab.getCols() - 1))
+
+			if(EndOfTable(i, j, tab))
 			{
 				winner = true;
 				return 0; //solve succeeded
 			}
 
-			//End of line
-			if (j == (size_t)tab.getCols() - 1)
+			if (EndOfLine(j, tab))
 			{
 				if (solveRec(i + 1, 0, tab, cm, fm, vParts) == 0) //move to the next line, and first column
 					return 0;
@@ -308,7 +328,6 @@ vector<int> Puzzle::getMostProbableRowSizes()
 	return sizes;
 }
 
-
 Table Puzzle::solveThread(const int rows)
 {
 	Table table(rows, m_iNumOfElements / rows);
@@ -347,24 +366,31 @@ Table Puzzle::Solve(int numThreads)
 	}
 	else {
 		for (const auto& i : possibleRows) {
+			
+		/*	print_mutex.lock();
+			printf("*** rows %d ***\n", i);
+			print_mutex.unlock();*/
+			
 			if (numThreads > 0) {
 				threads.push_back(std::async(std::launch::async, &Puzzle::solveThread, this, i));
 				numThreads--;
 
 			} else {
+				
+			/*	print_mutex.lock();
+				printf("Waiting...\n");
+				print_mutex.unlock();*/
+				
 				for (int j = 0; j < (int)threads.size(); j = (j+1) % threads.size())
 				{
 					if (threads[j].wait_for(span) != std::future_status::timeout) {
-						
 						Table table = threads[j].get();
 						
 						if (table.isSolved()) {
-							
 							for (auto& thread : threads) {
 								if (thread.valid())
 									thread.wait();
 							}
-						
 							return table;
 						}
 						else {

@@ -88,11 +88,14 @@ private:
 	 */
 	vector<int> getMostProbableRowSizes();
 
-	/* update the maps pointers such that each thread will eventually point to a copy of
-	* m_vparts, and also update this copy, so threads won't collide while solving the puzzle
-	*
-	*/
-	void Puzzle::updatePointersPerThread(common_match_t& cm, full_match_t& fm, vector<Part>& vPartsCopy);
+	/***********
+	* help functions for solve-rec
+	************/
+	void computePeeks(int& leftpeek, int& toppeek, int& rightpeek, int& bottompeek, 
+		int**& table, vector<Part>& vParts, size_t i, size_t j, Table& tab);
+	bool EndOfTable(size_t i, size_t j, Table& tab);
+	bool EndOfLine(size_t j, Table& tab);
+
 
 };
 

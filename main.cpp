@@ -37,6 +37,11 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
+	/*printf("num of threads %d\n", parser.getThreads());
+	printf("rotate %d\n", parser.getRotate());
+	printf("input file %s\n", parser.getInputFile().c_str());
+	printf("output file %s\n", parser.getOutputFile().c_str());*/
+
 	if (parser.getRotate())
 		puz = new rotatePuzzle();
 	else

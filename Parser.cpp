@@ -24,7 +24,7 @@ Parser::Parser(int argc, char* argv[]):
 		{
 			threadFlag = true;
 			std::istringstream iss;
-			iss.str(argv[i+1]);
+			iss.str(argv[++i]);
 			iss >> threads;
 			if (threads <= 0) //no number after this flag
 			{
