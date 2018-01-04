@@ -20,7 +20,6 @@ using std::pair;
 using std::mutex;
 using std::lock;
 
-static std::mutex print_mutex;
 
 //static global variable that should signal all threads that
 //someone has got a solution to the problem and they can close themselves
@@ -310,66 +309,8 @@ vector<int> Puzzle::getMostProbableRowSizes()
 }
 
 
-void Puzzle::updatePointersPerThread(common_match_t& cm, full_match_t& fm, vector<Part>& vPartsCopy)
-{
-	//common case
-	printf("common case\n");
-	for (int i = -1; i < 2; i++)
-	{
-		for (int j = -1; j < 2; j++)
-		{
-			printf("common case 1 \n");
-			auto common = cm[make_pair(i, j)];
-			printf("common case 2 \n");
-			for (auto &match : common)
-			{
-				printf("common case 3\n");
-				list<Part*> partList = *(match.first);
-				printf("common case 4\n");
-				for (Part*& p : partList)
-				{
-					printf("common case 5 %d, copy: %p\n", p->getId(), &vPartsCopy.at(0));
-					p = &vPartsCopy.at(p->getId() - 1);
-					printf("common case 6\n");
-				}
-			}
-		}
-	}
-
-
-	//full case
-	printf("full case\n");
-
-	for (int i = -2; i < 2; i++)
-	{
-		for (int j = -2; j < 2; j++)
-		{
-			for (int k = -2; k < 2; k++)
-			{
-				for (int l = -2; l < 2; l++)
-				{
-					auto full = fm[make_tuple(i, j, k, l)];
-					for (auto &match : full)
-					{
-						auto& partList = match.first;
-						for (auto& p : *partList)
-						{
-							p = &vPartsCopy.at(p->getId() - 1);
-						}
-					}
-				}
-			}
-		}
-	}
-}
-		
-
 Table Puzzle::solveThread(const int rows)
 {
-	print_mutex.lock();
-	printf("started thread of rows %d\n", rows);
-	print_mutex.unlock();
-
 	Table table(rows, m_iNumOfElements / rows);
 	auto vPartsCopy = m_vParts;
 
@@ -378,19 +319,10 @@ Table Puzzle::solveThread(const int rows)
 	createDataBase(vPartsCopy, cm, fm);
 
 	if (Puzzle::solveRec(0, 0, table, cm, fm, vPartsCopy) == 0) {
-		print_mutex.lock();
-		printf("thread of rows %d: setSolved\n", rows);
-		print_mutex.unlock();
-
 		table.setSolved();
-		//winner = true;
 
 		m_vParts = vPartsCopy; //the chosen one
 	}
-	
-	print_mutex.lock();
-	printf("finished thread of rows %d, solved: %d\n", rows, table.isSolved());
-	print_mutex.unlock();
 
 	return table;
 }
@@ -415,63 +347,29 @@ Table Puzzle::Solve(int numThreads)
 	}
 	else {
 		for (const auto& i : possibleRows) {
-			
-			print_mutex.lock();
-			printf("*** rows %d ***\n", i);
-			print_mutex.unlock();
-			
 			if (numThreads > 0) {
-				
-				print_mutex.lock();
-				printf("add new thread of rows %d\n", i);
-				print_mutex.unlock();
 				threads.push_back(std::async(std::launch::async, &Puzzle::solveThread, this, i));
 				numThreads--;
 
 			} else {
-				
-				print_mutex.lock();
-				printf("Waiting...\n");
-				print_mutex.unlock();
-				
 				for (int j = 0; j < (int)threads.size(); j = (j+1) % threads.size())
 				{
-					//print_mutex.lock();
-					//printf("Wait for thread num %d\n", j);
-					//print_mutex.unlock();
-					
 					if (threads[j].wait_for(span) != std::future_status::timeout) {
-						print_mutex.lock();
-						printf("thread %d finished\n", j);
-						print_mutex.unlock();
 						
 						Table table = threads[j].get();
 						
 						if (table.isSolved()) {
-							print_mutex.lock();
-							printf("thread %d solved!!!\n", j);
-							print_mutex.unlock();
 							
 							for (auto& thread : threads) {
 								if (thread.valid())
 									thread.wait();
 							}
-							print_mutex.lock();
-							printf("Finished waiting after solved, return table\n");
-							print_mutex.unlock();
+						
 							return table;
 						}
 						else {
-							print_mutex.lock();
-							printf("thread %d didn't solve...\n", j);
-							print_mutex.unlock();
-
 							if (!winner)
 							{
-								print_mutex.lock();
-								printf("fill array new thread of rows %d\n", i);
-								print_mutex.unlock();
-							
 								threads[j] = std::async(std::launch::async, &Puzzle::solveThread, this, i);
 							}
 							break;
