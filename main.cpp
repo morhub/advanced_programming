@@ -30,6 +30,13 @@ int main(int argc, char *argv[])
 	Parser parser(argc, argv);
 	std::ofstream output(parser.getOutputFile());
 
+	if (parser.getThreads() == ILLEGAL_THREADS)
+	{
+		cout << "Usage: " << argv[0] << " <input_file> <output_file> ";
+		cout << "[-rotate] [-threads %d] " << endl;
+		return -1;
+	}
+
 	printf("num of threads %d\n", parser.getThreads());
 	printf("rotate %d\n", parser.getRotate());
 	printf("input file %s\n", parser.getInputFile().c_str());

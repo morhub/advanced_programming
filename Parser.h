@@ -7,6 +7,7 @@
 
 
 using namespace std;
+#define ILLEGAL_THREADS -3
 
 
 class Parser
