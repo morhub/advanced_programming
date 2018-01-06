@@ -42,6 +42,8 @@ private:
 	virtual bool isValidStraightEdges(int sizei, int sizej);
 	virtual bool cornerCheck(bool &tr, bool &tl, bool &br, bool &bl);
 	virtual list<pair<list<Part*>*, list<int>>> getMatches(int left, int top, int right, int bottom, partMapNonRotate_t& partMap);
+	virtual void createDataBase(vector<Part>& parts, common_match_t& cm, full_match_t& fm);
+
 
 	/*
 	* A data structure which contains:
