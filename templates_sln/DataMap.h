@@ -25,10 +25,28 @@ public:
 		_map[coor].insert(p);
 	}
 
-	const list<Puzzle2dPiece<K>*>& get(Puzzle2dPiece<K>* p) {
+	list<Puzzle2dPiece<K>*> get(Puzzle2dPiece<K>* p) {
 		int dim =  p->getDimension();
 		int coor = p->getCoorAt(dim - Order);
 		
+		if (coor == std::numeric_limits<int>::min())
+		{
+			list<Puzzle2dPiece<K>*> res;
+			for (int i = -K; i <= K; i++)
+			{
+				if (_map.find(i) != _map.end()) //element found
+					res.splice(res.end(), _map[i].get(p)); //append lists in the right order
+				cout << "DataMap: " << endl;
+				for (auto& part : res)
+				{
+					cout << *part << endl;
+
+				}
+			}
+
+			return res;
+		}
+
 		if (_map.find(coor) != _map.end()) //element found
 			return _map[coor].get(p);
 
@@ -55,7 +73,7 @@ public:
 		_map[coor].push_back(p);
 	}
 
-	const list<Puzzle2dPiece<K>*>& get(Puzzle2dPiece<K>* p) {
+	 list<Puzzle2dPiece<K>*> get(Puzzle2dPiece<K>* p) {
 		int dim = p->getDimension();
 		int coor = p->getCoorAt(dim - 1);
 

@@ -6,6 +6,7 @@
 
 #include "Puzzle2dPiece.h"
 #include "DataMap.h"
+#include "DataBase.h"
 
 using namespace std;
 
@@ -38,6 +39,17 @@ int main()
 	cout << "size: " << l.size() << endl;
 	cout << "parts in l: " << *l.front() << endl;
 
+	///DataBase
+	DataBase<4,5> db(pieces.begin(), pieces.end());
+
+	auto ls= db.get(0, std::numeric_limits<int>::min(), 2, -5);
+	
+	cout << "DataBase: " << endl;
+	for (auto& part : ls)
+	{
+		 cout << *part << endl;
+
+	}
 
 	//////////////////first Main///////////////
 	     //********************************//
