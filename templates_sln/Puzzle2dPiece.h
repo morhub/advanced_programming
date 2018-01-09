@@ -8,12 +8,12 @@ using namespace std;
 
 
 template<int K>
-class Puzzle2dPiece : PuzzlePiece 
+class Puzzle2dPiece : public PuzzlePiece
 {
-	int getRange() { return K; }
 
 public:
-	Puzzle2dPiece(int first, int sec, int third, int forth) 
+	Puzzle2dPiece(int first, int sec, int third, int forth):
+		PuzzlePiece(K)
 	{
 		_coordinates.push_back(first);
 		_coordinates.push_back(sec);
