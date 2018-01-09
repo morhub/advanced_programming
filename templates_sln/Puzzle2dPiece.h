@@ -2,12 +2,14 @@
 #define PUZZLE2DPIECE_H
 
 #include <vector>
+#include "PuzzlePiece.h"
+
 using namespace std;
 
 
 template<int K>
-class Puzzle2dPiece {
-	vector<int> _coordinates;
+class Puzzle2dPiece : PuzzlePiece 
+{
 	int getRange() { return K; }
 
 public:
@@ -19,11 +21,6 @@ public:
 		_coordinates.push_back(forth);
 	}
 
-	vector<int>::iterator begin() { return _coordinates.begin();  }
-	vector<int>::iterator end()	{ return _coordinates.end();	}
-
-	const vector<int>& getCoors()const { return _coordinates; }
-
 	friend ostream& operator<<(ostream& out, const Puzzle2dPiece<K>& piece)
 	{
 		int dimension = piece.getCoors().size();
@@ -33,12 +30,9 @@ public:
 			out << piece.getCoors().at(i) << deli;
 		}
 		out << endl;
-		
+
 		return out;
 	}
-
-	int getCoorAt(int t) { return _coordinates.at(t); }
-	int getDimension()	 { return _coordinates.size(); }
 };
 
 
