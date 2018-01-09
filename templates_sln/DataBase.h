@@ -22,23 +22,17 @@ public:
 		}
 	}
 
-	list<Puzzle2dPiece<K>*> get(int a, int b, int c, int d)
+	const list<Puzzle2dPiece<K>*>* get(int first, int sec, int third, int forth)
 	{
-
-		Puzzle2dPiece<K> p(a, b, c, d);
+		Puzzle2dPiece<K> p(first, sec, third, forth);
 		return _map.get(&p);
-		
-
 	}
 
-
-
-
+	const list<Puzzle3dPiece<K>*>* get(int first, int sec, int third, int forth, int fifth, int sixth)
+	{
+		Puzzle3dPiece<K> p(first, sec, third, forth, fifth, sixth);
+		return _map.get(&p);
+	}
 };
-
-
-
-
-
 
 #endif

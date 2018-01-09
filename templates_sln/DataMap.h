@@ -27,14 +27,14 @@ public:
 		_map[joker].insert(p);
 	}
 
-	list<Puzzle2dPiece<K>*> get(Puzzle2dPiece<K>* p) {
+	const list<Puzzle2dPiece<K>*>* get(Puzzle2dPiece<K>* p) {
 		int dim =  p->getDimension();
 		int coor = p->getCoorAt(dim - Order);
 		
 		if (_map.find(coor) != _map.end()) //element found
 			return _map[coor].get(p);
 
-		return list<Puzzle2dPiece<K>*>();
+		return nullptr;
 	}
 };
 
@@ -59,16 +59,15 @@ public:
 		_map[joker].push_back(p);
 	}
 
-	 list<Puzzle2dPiece<K>*> get(Puzzle2dPiece<K>* p) {
+	 const list<Puzzle2dPiece<K>*>* get(Puzzle2dPiece<K>* p) {
 		int dim = p->getDimension();
 		int coor = p->getCoorAt(dim - 1);
 
 		if (_map.find(coor) != _map.end()) //element found
-			return _map[coor];
+			return &_map[coor];
 
-		return list<Puzzle2dPiece<K>*>();
+		return nullptr;
 	}
-
 };
 
 #endif

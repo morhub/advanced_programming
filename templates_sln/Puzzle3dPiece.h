@@ -23,6 +23,19 @@ public:
 		_coordinates.push_back(fifth);
 		_coordinates.push_back(sixth);
 	}
+
+	friend ostream& operator<<(ostream& out, const Puzzle3dPiece<K>& piece)
+	{
+		int dimension = piece.getCoors().size();
+		for (int i = 0; i < dimension; i++)
+		{
+			string deli = (i == dimension - 1) ? "" : ", ";
+			out << piece.getCoors().at(i) << deli;
+		}
+		out << endl;
+
+		return out;
+	}
 };
 
 

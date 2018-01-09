@@ -13,6 +13,8 @@
 
 using namespace std;
 
+
+
 int main()
 {
 	list<Puzzle2dPiece<5>> pieces = { { 0, 3, 2, -5 }, { 0, -2, 2, -5 } };
@@ -39,8 +41,8 @@ int main()
 
 	auto l = m.get(&piece2);
 
-	cout << "size: " << l.size() << endl;
-	cout << "parts in l: " << *l.front() << endl;
+	cout << "size: " << l->size() << endl;
+	cout << "parts in l: " << *(l->front()) << endl;
 
 	///DataBase
 	DataBase<4,5> db(pieces.begin(), pieces.end());
@@ -48,7 +50,7 @@ int main()
 	auto ls= db.get(0, std::numeric_limits<int>::min(), 2, -5);
 	
 	cout << "DataBase: " << endl;
-	for (auto& part : ls)
+	for (auto& part : *ls)
 	{
 		 cout << *part << endl;
 
