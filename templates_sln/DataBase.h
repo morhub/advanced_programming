@@ -7,14 +7,20 @@
 
 using namespace std;
 
-
-template<int DIM, int K>
-class DataBase 
+/*
+ * Class Database - A wrapper for DataMap data structure, which 
+ * holds a mapping for the puzzle pieces by their coordinates.
+ * In addition, it defines the main interface for the Data structure
+ * (which support insert at constuction time only, and query)
+ */
+template<typename Iter>
+class DataBase
 {
-	DataMap<DIM,K> _map;
+	using DataType = typename std::iterator_traits<Iter>::value_type;
+	DataMap<DataType, DataType::Dimension> _map;
 
 public:
-	DataBase(typename list<Puzzle2dPiece<K>>::iterator _begin, typename list<Puzzle2dPiece<K>>::iterator _end)
+	DataBase(Iter _begin, Iter _end)
 	{
 		for (auto& it = _begin; it != _end; it++)
 		{
@@ -22,17 +28,10 @@ public:
 		}
 	}
 
-	const list<Puzzle2dPiece<K>*>* get(int first, int sec, int third, int forth)
+	const list<DataType*>& get(DataType p)
 	{
-		Puzzle2dPiece<K> p(first, sec, third, forth);
-		return _map.get(&p);
-	}
-
-	const list<Puzzle3dPiece<K>*>* get(int first, int sec, int third, int forth, int fifth, int sixth)
-	{
-		Puzzle3dPiece<K> p(first, sec, third, forth, fifth, sixth);
-		return _map.get(&p);
+		auto ret = _map.get(&p);
+		return (ret == nullptr) ? *(new list<DataType*>()) : *(ret);
 	}
 };
-
 #endif

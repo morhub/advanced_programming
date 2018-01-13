@@ -10,10 +10,9 @@ using namespace std;
 template<int K>
 class Puzzle2dPiece : public PuzzlePiece
 {
-
 public:
-	Puzzle2dPiece(int first, int sec, int third, int forth):
-		PuzzlePiece(K)
+	static const size_t Dimension = 4;
+	Puzzle2dPiece(int first, int sec, int third, int forth)
 	{
 		_coordinates.push_back(first);
 		_coordinates.push_back(sec);
@@ -23,18 +22,15 @@ public:
 
 	friend ostream& operator<<(ostream& out, const Puzzle2dPiece<K>& piece)
 	{
-		int dimension = piece.getCoors().size();
+		int dimension = piece.Dimension;
 		for (int i = 0; i < dimension; i++)
 		{
 			string deli = (i == dimension - 1) ? "" : ", ";
-			out << piece.getCoors().at(i) << deli;
+			out << piece.getCoorAt(i) << deli;
 		}
-		out << endl;
 
 		return out;
 	}
 };
-
-
 
 #endif

@@ -5,65 +5,71 @@
 #include <map>
 
 using namespace std;
+static const int joker = std::numeric_limits<int>::min();
 
-template<int Order, int K>
+/* DataMap - Recursively Templated Data structure.
+ * Each i-Order templated class holds a mapping
+ * w.r.t the i-th coordinate in DataType class.
+ */
+template<typename DataType, size_t Order>
 class DataMap
 {
-	map<int, DataMap<Order - 1, K>> _map;
-	static const int joker = std::numeric_limits<int>::min();
+	map<int, DataMap<DataType, Order - 1>> _map;
 
 public:
-	void insert(Puzzle2dPiece<K>* p) {
-		//gets the Order's coordinate *from the end* of Part
-		int dim  = p->getDimension();
+	void insert(DataType* p) {
+		int dim  = p->Dimension;
 		int coor = p->getCoorAt(dim-Order);
 
 		//if new entry, create a list for it
-		if (_map.find(coor) == _map.end()) //element not found
-			_map[coor] = DataMap<Order - 1, K>();
+		if (_map.find(coor) == _map.end())
+			_map[coor] = DataMap<DataType, Order - 1>();
 
 		//recursively insert to lower level
 		_map[coor].insert(p);
 		_map[joker].insert(p);
 	}
 
-	const list<Puzzle2dPiece<K>*>* get(Puzzle2dPiece<K>* p) {
-		int dim =  p->getDimension();
+	const list<DataType*>* get(DataType* p) {
+		int dim =  p->Dimension;
 		int coor = p->getCoorAt(dim - Order);
 		
-		if (_map.find(coor) != _map.end()) //element found
+		if (_map.find(coor) != _map.end())
 			return _map[coor].get(p);
 
 		return nullptr;
 	}
 };
 
-template<int K>
-class DataMap<1, K>
+/* DataMap<1> - Base for Recursive Templated Data structure.
+ * Holds a mapping w.r.t the last coordinate in DataType class.
+ * Practically implements the DB interface (insert, get) by directly
+ * insert to / retrieve from the relevat list. 
+ */
+template<typename DataType>
+class DataMap<DataType, (size_t)1>
 {
-	map<int, list<Puzzle2dPiece<K>*>> _map;
-	static const int joker = std::numeric_limits<int>::min();
+	map<int, list<DataType*>> _map;
 
 public:
-	void insert(Puzzle2dPiece<K>* p) {
-		//gets the last coordinate *from the end* of Part
-		int dim = p->getDimension();
+	void insert(DataType* p) {
+		int dim = p->Dimension;
 		int coor = p->getCoorAt(dim - 1);
 
 		//if new entry, create a list for it
-		if (_map.find(coor) == _map.end()) //element not found
-			_map[coor] = list<Puzzle2dPiece<K>*>();
+		if (_map.find(coor) == _map.end())
+			_map[coor] = list<DataType*>();
 
 		//actually insert part to list
 		_map[coor].push_back(p);
 		_map[joker].push_back(p);
 	}
 
-	 const list<Puzzle2dPiece<K>*>* get(Puzzle2dPiece<K>* p) {
-		int dim = p->getDimension();
+	 const list<DataType*>* get(DataType* p) {
+		int dim = p->Dimension;
 		int coor = p->getCoorAt(dim - 1);
 
-		if (_map.find(coor) != _map.end()) //element found
+		if (_map.find(coor) != _map.end())
 			return &_map[coor];
 
 		return nullptr;

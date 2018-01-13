@@ -13,65 +13,36 @@
 
 using namespace std;
 
-
+template<typename Iter, typename IterType = std::iterator_traits<Iter>::iterator_category()>
+DataBase<Iter> groupPuzzlePieces(Iter first, Iter last)
+{
+	return DataBase<Iter>(first, last);
+}
 
 int main()
 {
-	list<Puzzle2dPiece<5>> pieces = { { 0, 3, 2, -5 }, { 0, -2, 2, -5 } };
-	Puzzle2dPiece<5> piece(1, 2, 3, 4);
-	Puzzle2dPiece<5> piece2(4,3,2,1);
-
-	cout << pieces.front();
-	cout << piece;
-
-	cout << "******" << endl;
-	for(auto& c: pieces.front().getCoors())
-		cout << c <<endl;
-
-	cout << "******" << endl;
-	for (auto& coor : piece)
-		cout << coor << endl;
-
-
-	//////DataMap
-	DataMap<4,5> m = *(new DataMap<4,5>());
-	m.insert(&piece);
-	m.insert(&piece2);
-
-
-	auto l = m.get(&piece2);
-
-	cout << "size: " << l->size() << endl;
-	cout << "parts in l: " << *(l->front()) << endl;
-
-	///DataBase
-	DataBase<4,5> db(pieces.begin(), pieces.end());
-
-	auto ls= db.get(0, std::numeric_limits<int>::min(), 2, -5);
-	
-	cout << "DataBase: " << endl;
-	for (auto& part : *ls)
-	{
-		 cout << *part << endl;
-
+	cout << "2D Main:" << endl;
+	list<Puzzle2dPiece<5>> pieces4 = { { 0, 3, 2, -5 },{ 0, -2, 2, -5 } };
+	auto groups4 = groupPuzzlePieces(pieces4.begin(), pieces4.end());
+	// note that there is no & on the auto below (was in previous version)
+	auto some_pieces4 = groups4.get({ 0, std::numeric_limits<int>::min(), 2, -5 });
+	for (auto piece_ptr4 : some_pieces4) {
+		std::cout << *piece_ptr4 << std::endl; // will print both pieces!
 	}
 
-	//////////////////first Main///////////////
-	     //********************************//
-	//list<Puzzle2dPiece<5>> pieces = { { 0, 3, 2, -5 },{ 0, -2, 2, -5 } };
-	//auto groups = groupPuzzlePieces(pieces.begin(), pieces.end());
-	//auto some_pieces = groups.get({ 0, 3, 2, std::numeric_limits<int>::min() });
-	//for (auto piece_ptr : some_pieces) {
-	//	std::cout << *piece_ptr << std::endl; // will print the first piece!
+	cout << endl;
 
-	//////////////////second Main///////////////
-	//********************************//
-	//list<Puzzle2dPiece<5>> pieces = { { 0, 3, 2, -5 },{ 0, -2, 2, -5 } };
-	//auto groups = groupPuzzlePieces(pieces.begin(), pieces.end());
-	//auto some_pieces = groups.get({ 0, std::numeric_limits<int>::min(), 2, -5 });
-	//for (auto piece_ptr : some_pieces) {
-	//	std::cout << *piece_ptr << std::endl; // will print both pieces!
-	
-    return 0;
+	cout << "3D Main:" << endl;
+	list<Puzzle3dPiece<1>> pieces6 = { { 0, 1, 1, 1, -1, -1 },{ 0, -1, 1, 1, 1, 1 } };
+	auto groups6 = groupPuzzlePieces(pieces6.begin(), pieces6.end());
+	// note that there is no & on the auto below (was in previous version)
+	auto some_pieces6 = groups6.get({ 0, 1, 1, 1, 1, 1 });
+	for (auto piece_ptr6 : some_pieces6) {
+		std::cout << *piece_ptr6 << std::endl; // will print nothing!
+	}
+
+	cout << endl;
+
+	return 0;
 }
 
