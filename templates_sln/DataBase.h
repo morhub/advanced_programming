@@ -2,7 +2,6 @@
 #define DATABASE_H
 
 #include "DataMap.h"
-#include "Puzzle2dPiece.h"
 #include <iostream>
 
 using namespace std;
