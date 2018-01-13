@@ -1,7 +1,6 @@
 #ifndef DATAMAP_H
 #define DATAMAP_H
 
-#include "Puzzle2dPiece.h"
 #include <map>
 
 using namespace std;
