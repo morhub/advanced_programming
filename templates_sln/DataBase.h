@@ -33,4 +33,10 @@ public:
 		return (ret == nullptr) ? *(new list<DataType*>()) : *(ret);
 	}
 };
+
+template<typename Iter, typename IterType = std::iterator_traits<Iter>::iterator_category()>
+DataBase<Iter> groupPuzzlePieces(Iter first, Iter last)
+{
+	return DataBase<Iter>(first, last);
+}
 #endif

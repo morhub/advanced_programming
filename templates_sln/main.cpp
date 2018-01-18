@@ -1,23 +1,8 @@
-#include <iostream>
-#include <list>
-#include <fstream>
-#include <string>
-#include <cstring>
-
-#include "Puzzle2dPiece.h"
-#include "Puzzle3dPiece.h"
-#include "PuzzlePiece.h"
-
-#include "DataMap.h"
-#include "DataBase.h"
+#include "ex4headers.h"
 
 using namespace std;
 
-template<typename Iter, typename IterType = std::iterator_traits<Iter>::iterator_category()>
-DataBase<Iter> groupPuzzlePieces(Iter first, Iter last)
-{
-	return DataBase<Iter>(first, last);
-}
+
 
 int main()
 {
