@@ -34,7 +34,7 @@ public:
 	}
 };
 
-template<typename Iter, typename IterType = std::iterator_traits<Iter>::iterator_category()>
+template<typename Iter>
 DataBase<Iter> groupPuzzlePieces(Iter first, Iter last)
 {
 	return DataBase<Iter>(first, last);
